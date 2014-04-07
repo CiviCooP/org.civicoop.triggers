@@ -40,7 +40,7 @@ CREATE TABLE IF NOT EXISTS `civicrm_trigger_action` (
   `schedule` varchar(255) NOT NULL,
   `last_run` datetime DEFAULT NULL,
   `next_run` datetime DEFAULT NULL,
-  `active` int(1) NOT NULL,
+  `is_active` int(1) NOT NULL,
   `start_date` datetime DEFAULT NULL,
   `end_date` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
@@ -53,7 +53,7 @@ CREATE TABLE IF NOT EXISTS `civicrm_trigger_action` (
 --
 
 CREATE TABLE IF NOT EXISTS `civicrm_trigger_rule_condition` (
-  `Iid` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `trigger_rule_id` int(11) unsigned NOT NULL,
   `field_name` varchar(255) NOT NULL,
   `old_value` text,
