@@ -1,11 +1,11 @@
 <?xml version="1.0"?>
 <extension key="org.civicoop.triggers" type="module">
   <file>triggers</file>
-  <name>FIXME</name>
-  <description>FIXME</description>
+  <name>CiviCRM Triggers</name>
+  <description>Triggers and actions for civicrm</description>
   <license>AGPL-3.0</license>
   <maintainer>
-    <author>Jaap Jansma</author>
+    <author>Jaap Jansma / Erik Hommel</author>
     <email>helpdesk@civicoop.org</email>
   </maintainer>
   <releaseDate>2014-04-07</releaseDate>
