@@ -30,6 +30,8 @@ function civicrm_api3_trigger_action_process($params) {
     //this consists of the following steps
     //1. retrieve the entities which match the condition of the trigger
     //2. prepare the api action with the entity
+    //3. set next run day
+    
   }
 }
 
