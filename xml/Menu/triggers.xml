@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<menu>
+  <item>
+    <path>civicrm/triggerrules</path>
+    <page_callback>CRM_Triggers_Form_TriggerRules</page_callback>
+    <title>TriggerRules</title>
+    <access_arguments>access CiviCRM</access_arguments>
+  </item>
+  <item>
+    <path>civicrm/actionrules</path>
+    <page_callback>CRM_Triggers_Form_ActionRules</page_callback>
+    <title>ActionRules</title>
+    <access_arguments>access CiviCRM</access_arguments>
+  </item>
+  <item>
+    <path>civicrm/triggerruleslist</path>
+    <page_callback>CRM_Triggers_Page_TriggerRules</page_callback>
+    <title>TriggerRules</title>
+    <access_arguments>access CiviCRM</access_arguments>
+  </item>
+</menu>

@@ -106,3 +106,60 @@ function triggers_civicrm_caseTypes(&$caseTypes) {
 function triggers_civicrm_alterSettingsFolders(&$metaDataFolders = NULL) {
   _triggers_civix_civicrm_alterSettingsFolders($metaDataFolders);
 }
+/**
+ * Implementation of hook civicrm_navigationMenu
+ * to create a trigger_action menu
+ * 
+ * @author Erik Hommel (erik.hommel@civicoop.org http://www.civicoop.org)
+ * @date 7 Apr 2014
+ */
+function triggers_civicrm_navigationMenu( &$params ) {
+    $itemMain = array (
+        'name'          =>  ts('Trigger Action Rules'),
+        'permission'    => 'administer CiviCRM',
+    );
+    _triggers_civix_insert_navigation_menu($params, 'Administer', $itemMain);
+    
+    $listTrigger = array(
+        'name'          =>  ts('List Triggers'),
+        'url'           =>  'civicrm/triggerruleslist',
+        'permission'    =>  'administer CiviCRM'
+    );
+    _triggers_civix_insert_navigation_menu($params, 'Administer/Trigger Action Rules', $listTrigger);
+    
+    $addTrigger = array(
+        'name'          =>  ts('Add Trigger'),
+        'url'           =>  'civicrm/triggerrules/add&reset=1',
+        'permission'    =>  'administer CiviCRM'
+    );
+    _triggers_civix_insert_navigation_menu($params, 'Administer/Trigger Action Rules', $addTrigger);
+    
+    $listAction = array(
+        'name'          =>  ts('List Actions'),
+        'url'           =>  'civicrm/actionruleslist',
+        'permission'    =>  'administer CiviCRM'
+    );
+    _triggers_civix_insert_navigation_menu($params, 'Administer/Trigger Action Rules', $listAction);
+    
+    $addAction = array(
+        'name'          =>  ts('Add Action'),
+        'url'           =>  'civicrm/actionrules/add&reset=1',
+        'permission'    =>  'administer CiviCRM'
+    );
+    _triggers_civix_insert_navigation_menu($params, 'Administer/Trigger Action Rules', $addAction);
+    
+    $listTriggerAction = array(
+        'name'          =>  ts('List Trigger/Action Combinations'),
+        'url'           =>  'civicrm/triggeractionlist',
+        'permission'    =>  'administer CiviCRM'
+    );
+    _triggers_civix_insert_navigation_menu($params, 'Administer/Trigger Action Rules', $listTriggerAction);
+    
+    $addTriggerAction = array(
+        'name'          =>  ts('Add Trigger/Action Combination'),
+        'url'           =>  'civicrm/triggeraction/add&reset=1',
+        'permission'    =>  'administer CiviCRM'
+    );
+    _triggers_civix_insert_navigation_menu($params, 'Administer/Trigger Action Rules', $addTriggerAction);
+    
+}
