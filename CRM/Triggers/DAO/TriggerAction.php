@@ -93,11 +93,14 @@ class CRM_Triggers_DAO_TriggerAction extends CRM_Core_DAO {
     if (!(self::$_fieldKeys)) {
       self::$_fieldKeys = array(
         'id' => 'id',
-        'subject' => 'subject',
-        'added_by' => 'added_by',
-        'date_added' => 'date_added',
-        'updated_by' => 'updated_by',
-        'date_updated' => 'date_updated',
+        'trigger_rule_id' => 'trigger_rule_id',
+        'action_rule_id' => 'action_rule_id',
+        'schedule' => 'schedule',
+        'last_run' => 'last_run',
+        'next' => 'next_run',
+        'is_active' => 'is_active',
+        'start_date' => 'start_date',
+        'end_date' => 'end_date',
       );
     }
     return self::$_fieldKeys;
