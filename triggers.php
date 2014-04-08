@@ -129,7 +129,7 @@ function triggers_civicrm_navigationMenu( &$params ) {
     
     $addTrigger = array(
         'name'          =>  ts('Add Trigger'),
-        'url'           =>  'civicrm/triggerrules/add&reset=1',
+        'url'           =>  'civicrm/triggerrules&action=add&reset=1',
         'permission'    =>  'administer CiviCRM'
     );
     _triggers_civix_insert_navigation_menu($params, 'Administer/Trigger Action Rules', $addTrigger);
@@ -143,7 +143,7 @@ function triggers_civicrm_navigationMenu( &$params ) {
     
     $addAction = array(
         'name'          =>  ts('Add Action'),
-        'url'           =>  'civicrm/actionrules/add&reset=1',
+        'url'           =>  'civicrm/actionrules&action=add&reset=1',
         'permission'    =>  'administer CiviCRM'
     );
     _triggers_civix_insert_navigation_menu($params, 'Administer/Trigger Action Rules', $addAction);
@@ -157,7 +157,7 @@ function triggers_civicrm_navigationMenu( &$params ) {
     
     $addTriggerAction = array(
         'name'          =>  ts('Add Trigger/Action Combination'),
-        'url'           =>  'civicrm/triggeraction/add&reset=1',
+        'url'           =>  'civicrm/triggeraction&action=add&reset=1',
         'permission'    =>  'administer CiviCRM'
     );
     _triggers_civix_insert_navigation_menu($params, 'Administer/Trigger Action Rules', $addTriggerAction);
