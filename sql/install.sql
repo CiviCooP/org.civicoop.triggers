@@ -62,7 +62,7 @@ CREATE TABLE IF NOT EXISTS `civicrm_trigger_rule_condition` (
   `new_op` int(255) NOT NULL,
   `aggregate_function` varchar(255) DEFAULT NULL,
   `grouping_field` varchar(255) DEFAULT NULL,
-  PRIMARY KEY (`Iid`)
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
 CREATE TABLE IF NOT EXISTS `civicrm_processed_trigger` (
