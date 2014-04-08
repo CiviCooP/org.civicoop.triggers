@@ -45,6 +45,13 @@ class CRM_Triggers_DAO_ActionRule extends CRM_Core_DAO {
           'maxlength' => 255,
           'size' => CRM_Utils_Type::HUGE,
         ) ,
+        'name' => array(
+          'name' => 'name',
+          'type' => CRM_Utils_Type::T_STRING,
+          'required' => true,
+          'maxlength' => 255,
+          'size' => CRM_Utils_Type::HUGE,
+        ) ,
         'entity' => array(
           'name' => 'entity',
           'type' => CRM_Utils_Type::T_STRING,
@@ -81,6 +88,7 @@ class CRM_Triggers_DAO_ActionRule extends CRM_Core_DAO {
       self::$_fieldKeys = array(
         'id' => 'id',
         'label' => 'label',
+        'name' => 'name',
         'entity' => 'entity',
         'action' => 'action',
         'params' => 'params',
