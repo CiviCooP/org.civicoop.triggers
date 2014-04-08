@@ -24,11 +24,20 @@ class CRM_Triggers_Form_TriggerRules extends CRM_Core_Form {
         /*
          * add form elements
          */
-        $this->add('text', 'label', ts('Label'), 
-            array(
-                'maxlength' => 255,
-                'size' => CRM_Utils_Type::HUGE,
-            ), true);
+        if ($this->_action == CRM_Core_Action::VIEW) {
+            $this->add('text', 'label', ts('Label'), 
+                array(
+                    'maxlength' => 255,
+                    'readonly'  => 'readonly',
+                    'size' => CRM_Utils_Type::HUGE,
+                ), true);
+        } else {
+            $this->add('text', 'label', ts('Label'), 
+                array(
+                    'maxlength' => 255,
+                    'size' => CRM_Utils_Type::HUGE,
+                ), true);            
+        }
         $this->add('select', 'entity', ts('Entity'), $this->_entities, true);
         $validActions = array('Create', 'Delete', 'Read', 'Update');
         /**
@@ -37,12 +46,11 @@ class CRM_Triggers_Form_TriggerRules extends CRM_Core_Form {
          */
         //$this->add('select', 'operation', ts('Operation'), $validActions, true);
         
-    
         $this->addButtons(array(
             array(
-              'type' => 'next',
-              'name' => ts('Save'),
-              'isDefault' => TRUE,
+                'type' => 'next',
+                'name' => ts('Save'),
+                'isDefault' => TRUE,
             ),
             array(
               'type' => 'cancel',
@@ -73,6 +81,9 @@ class CRM_Triggers_Form_TriggerRules extends CRM_Core_Form {
             $conditionHeaders = array('Field Name', 'Operation', 'Value', 'Aggregate Function', 'Grouping Field');
             $this->assign('conditionHeaders', $conditionHeaders);
         }
+        /*
+         * set page title based on action
+         */
         switch($this->_action) {
             case CRM_Core_Action::ADD:
                 $pageTitle = "New Trigger";
@@ -88,14 +99,19 @@ class CRM_Triggers_Form_TriggerRules extends CRM_Core_Form {
                 break;
         }
         CRM_Utils_System::setTitle(ts($pageTitle));
-
+        /*
+         * if action is update, give possibility to add condition
+         */
         $this->setDefaultValues();
     }
     function postProcess() {
         $values = $this->exportValues();
-        CRM_Core_Error::debug("values", $values);
-        CRM_Core_Error::debug("this", $this);
-        exit();
+        $saveParams['label'] = $values['label'];
+        $saveParams['entity'] = CRM_Utils_Array::value($values['entity'], $this->_entities);
+        $savedTriggerRule = CRM_Triggers_BAO_TriggerRule::add($saveParams);
+        if ($this->_action == CRM_Core_Action::ADD) {
+            $session->pushUserContext(CRM_Utils_System::url('civicrm/triggerruleconditions', 'action=add&tid=', true));
+        }
         parent::postProcess();
     }
 

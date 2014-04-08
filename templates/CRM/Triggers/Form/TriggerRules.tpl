@@ -14,7 +14,11 @@
             {foreach from=$elementNames item=elementName}
               <div class="crm-section">
                   <div class="label">{$form.$elementName.label}</div>
-                  <div class="content">{$form.$elementName.html}</div>
+                  {if $action eq 4}
+                      <div class="content" readonly="readonly">{$form.$elementName.html}</div>
+                  {else}
+                      <div class="content">{$form.$elementName.html}</div>
+                  {/if}
                   <div class="clear"></div>
               </div>
             {/foreach}

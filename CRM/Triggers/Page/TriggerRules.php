@@ -37,9 +37,9 @@ class CRM_Triggers_Page_TriggerRules extends CRM_Core_Page {
                 WHERE trigger_rule_id = '.$daoTriggers->id;
             $daoCondition = CRM_Core_DAO::executeQuery($queryCondition);
             if ($daoCondition->fetch() && $daoCondition->countCondition > 0) {
-                $row['condition'] = "Y";
+                $row['conditions'] = ts("Yes");
             } else {
-                $row['condition'] = "N";
+                $row['conditions'] = ts("No");
             }            
             $rowActions = array();
             $viewUrl = CRM_Utils_System::url('civicrm/triggerrules', 'action=view&reset=1&tid='.$daoTriggers->id, true);
