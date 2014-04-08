@@ -38,7 +38,7 @@ class CRM_Triggers_BAO_TriggerAction extends CRM_Triggers_DAO_TriggerAction {
     $trigger->whereAdd("id = '".$this->trigger_rule_id."'");
     $trigger->find(TRUE);
     
-    //now build condition query
+    $trigger->findEntities();
   }
   
   /**
