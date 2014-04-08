@@ -14,6 +14,7 @@
                     {foreach from=$rowHeaders item=rowHeader}
                         <th class="sorting-disabled">{$rowHeader}</th>
                     {/foreach}
+                    <th class="sorting-disabled"></th>
                 </tr>
             </thead>
             <tbody>
@@ -21,9 +22,11 @@
                 {assign var="rowId" value=1}
                 {foreach from=$rows item=row}
                     <tr id="row{$row.id}" class={$rowClass}>
-                        {foreach from=$row.elements item=rowElement}
-                            <td hidden="{$rowElement.hidden}">{$rowElement}</td>
-                        {/foreach}
+                        <td hidden="1">{$row.id}</td>
+                        <td>{$row.label}</td>
+                        <td>{$row.entity}</td>
+                        {*<td>{$row.operation}</td>*}
+                        <td>{$row.conditions}</td>
                         <td>
                             <span>
                                 {foreach from=$row.actions item=actionLink}
