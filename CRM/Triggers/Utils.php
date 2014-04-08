@@ -34,4 +34,23 @@ class CRM_Triggers_Utils {
     return implode('', $fragments);
   }
   
+  /**
+   * Returns the contact ID belonging to an entity
+   * 
+   * @param CRM_Core_DAO $objRef
+   * @return null
+   */
+  public static function getContactIdFromEntity(CRM_Core_DAO $objRef) {
+    if ($objRef instanceof CRM_Contact_DAO_Contact) {
+      return $objRef->id;
+    }
+    
+    $fields = $objRef->fields();
+    if (isset($fields['contact_id'])) {
+      return $objRef->contact_id;
+    }
+    
+    return null; //no contact id for entity present
+  }
+  
 }

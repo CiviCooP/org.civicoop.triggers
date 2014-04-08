@@ -46,11 +46,20 @@ function civicrm_api3_trigger_action_process($params) {
     $trigger->find(TRUE);
     
     $action = CRM_Triggers_BAO_ActionRule::findByActionId($actions->action_rule_id);
+    $processedEntityCount = 0;
     while ($entities->fetch()) {
       //process the entity
-      $action->processEntity($entities, $trigger);
-      //add an activity type and add this entity to the processed table
+      if ($action->processEntity($entities, $trigger)) {
+        $processedEntityCount ++;
+        //add an activity type and add this entity to the processed table
+        
+        //save the entity as processed
+        CRM_Triggers_BAO_ProcessedTrigger::processTrigger($entities, $trigger, $actions);
+      }
+      
     }
+    $count ++;
+    $messages[] = 'Trigger "'.$trigger->label.'" processed '.$processedEntityCount.' entities';
   }
   
   $params['message'] = 'Processed '.$count.' triggers. '.implode(' ', $messages);
