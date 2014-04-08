@@ -17,7 +17,26 @@ require_once 'CRM/Core/Form.php';
  * @see http://wiki.civicrm.org/confluence/display/CRMDOC43/QuickForm+Reference
  */
 class CRM_Triggers_Form_TriggerRules extends CRM_Core_Form {
+    protected $_id = 0;
     function buildQuickForm() {
+        /*
+         * if action is not add, store trigger_rule_id in $this->_id
+         * and retrieve conditions for trigger
+         */
+        $test = CRM_Triggers_BAO_TriggerRuleCondition::getValues(array('field_name' => 'is_active'));
+        CRM_Core_Error::debug('test na fetch', $test);
+        exit();
+        
+        
+        if ($this->_action != CRM_Core_Action::ADD) {
+            $this->_id = CRM_Utils_Request::retrieve('tid', 'Integer', $this);
+            $conditionParams = array('trigger_rule_id', $this->_id);
+            $triggerConditions = CRM_Triggers_BAO_TriggerRuleCondition::get($conditionParams);
+            $this->assign('conditionRows', $triggerConditions);
+            $conditionFields = CRM_Triggers_BAO_TriggerRuleCondition::fields();
+            $conditionHeaders = array('Field Name', 'Operation', 'Value', 'Aggregate Function', 'Grouping Field');
+            $this->assign('conditionHeaders', $conditionHeaders);
+        }
         /*
          * add form elements
          */
@@ -26,15 +45,15 @@ class CRM_Triggers_Form_TriggerRules extends CRM_Core_Form {
                 'maxlength' => 255,
                 'size' => CRM_Utils_Type::HUGE,
             ), true);
-        $validEntities = array('Activity', 'Contribution', 'Group', 'GroupContact');
+        $validEntities = array('Activity', 'Contribution', 'GroupContact');
         $this->add('select', 'entity', ts('Entity'), $validEntities, true);
         $validActions = array('Create', 'Delete', 'Read', 'Update');
-        $this->add('select', 'action', ts('Action'), $validActions, true);
-        $this->add('textarea', 'parameters', ts('Parameters'), 
-            array(
-                'cols' => '80',
-                'rows' => '5'
-            ), false);
+        /**
+         * EH 8 Apr 2014: not required as long as we do cron processing only
+         * @todo bring back when using post hook
+         */
+        //$this->add('select', 'operation', ts('Operation'), $validActions, true);
+        
     
         $this->addButtons(array(
             array(
