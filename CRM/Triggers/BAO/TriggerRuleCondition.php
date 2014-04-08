@@ -13,11 +13,17 @@ class CRM_Triggers_BAO_TriggerRuleCondition extends CRM_Triggers_DAO_TriggerRule
    */
   public function parseCondition(CRM_Core_DAO $dao) {
     
+    //check if field exist in DAO
+    $fields = $dao->fields();
+    if (!isset($fields[$this->field_name])) {
+      throw new CRM_Triggers_Exception_InvalidCondition("Invalid field '".$this->field_name."'");
+    }
+    
     //determine if this condition is an aggregation
     $is_aggregate = false;
     if (!empty($this->aggregate_function) && !empty($this->grouping_field)) {
       $is_aggregate = true;
-    }   
+    }
     
     if ($is_aggregate) {
       $having = $this->aggregate_function ."(`".$this->field_name."`)";
