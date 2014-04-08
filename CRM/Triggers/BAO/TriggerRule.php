@@ -68,6 +68,32 @@ class CRM_Triggers_BAO_TriggerRule extends CRM_Triggers_DAO_TriggerRule {
         self::storeValues($triggerRule, $result);
         return $result;
     }
+    /**
+     * Function to add or update trigger rule
+     * 
+     * @author Erik Hommel (CiviCooP) <erik.hommel@civicoop.org>
+     * @date 8 Apr 2014
+     * @param array $params 
+     * @return array $result
+     * @access public
+     * @static
+     */
+    public static function add($params) {
+        $result = array();
+        if (empty($params)) {
+            CRM_Core_Error::fatal('Params can not be empty when adding or updating a TriggerRule');
+        }
+        $triggerRule = new CRM_Triggers_BAO_TriggerRule();
+        $fields = self::fields();
+        foreach ($params as $paramKey => $paramValue) {
+            if (isset($fields[$paramKey])) {
+                $triggerRule->$paramKey = $paramValue;
+            }
+        }
+        $triggerRule->save();
+        self::storeValues($triggerRule, $result);
+        return $result;
+    }
   
 }
 
