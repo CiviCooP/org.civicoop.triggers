@@ -9,7 +9,7 @@ We want to achieve the following:
 - Every contact which first name is equal to John we want them to be added to the group 'Johns'. 
 - This group has id 6.
 
-** Trigger Rules**
+###Trigger Rules
 
 The trigger rules and the condition determine which entities to match for triggering
 
@@ -21,7 +21,7 @@ The trigger rules and the condition determine which entities to match for trigge
 </tbody>
 </table>
 
-** Trigger conditions **
+###Trigger conditions
 
 <table>
 <thead><tr><th>id</th><th>Trigger rule ID</th><th>Field</th><th>Value</th><th>Operator</th><th>Aggregate function</th><th>Grouping field</th></tr></thead>
@@ -30,7 +30,7 @@ The trigger rules and the condition determine which entities to match for trigge
 </tbody>
 </table>
 
-** Action rules **
+###Action rules
 
 The action is the action which is executed on a found entity. The action consist of calling the civicrm api.
 
@@ -43,7 +43,7 @@ The action is the action which is executed on a found entity. The action consist
 
 The API parameters can contain *tokens* which consist of curly brackets around them and the entity name with a dot for the field of the entity. e.g. {contribution.total_amount}
 
-** Trigger actions **
+###Trigger actions
 
 A trigger/action pair is a combination of a selected trigger with a selected action.
 
