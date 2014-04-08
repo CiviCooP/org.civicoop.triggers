@@ -13,6 +13,24 @@ class CRM_Triggers_BAO_TriggerRuleCondition extends CRM_Triggers_DAO_TriggerRule
    */
   public function parseCondition(CRM_Core_DAO $dao) {
     
+    //determine if this condition is an aggregation
+    $is_aggregate = false;
+    if (!empty($this->aggregate_function) && !empty($this->grouping_field)) {
+      $is_aggregate = true;
+    }   
+    
+    if ($is_aggregate) {
+      $having = $this->aggregate_function ."(`".$this->field_name."`)";
+      $having .= " ".$this->operation." ";
+      $having .= " '".$this->value."'";
+      $dao->having($having);
+      $dao->groupBy($this->grouping_field);
+    } else {
+      $clause = "`".$this->field_name."`";
+      $clause .= " ".$this->operation." ";
+      $clause .= " '".$this->value."'";
+      $dao->whereAdd($clause);
+    }
   }
   
   public static function findByTriggerRuleId($trigger_rule_id, $fetchFirst=FALSE) {
