@@ -7,6 +7,7 @@
 CREATE TABLE IF NOT EXISTS `civicrm_action_rule` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `label` varchar(255) NOT NULL,
+  `name` varchar(255) NOT NULL,
   `entity` varchar(255) NOT NULL,
   `action` varchar(255) NOT NULL,
   `params` text,
@@ -22,6 +23,7 @@ CREATE TABLE IF NOT EXISTS `civicrm_action_rule` (
 CREATE TABLE IF NOT EXISTS `civicrm_trigger_rule` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `label` varchar(255) NOT NULL,
+  `name` varchar(255) NOT NULL,
   `entity` varchar(255) NOT NULL,
   `operation` varchar(255),
   PRIMARY KEY (`id`)
