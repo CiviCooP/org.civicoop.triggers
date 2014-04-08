@@ -44,14 +44,14 @@ class CRM_Triggers_DAO_TriggerRuleCondition extends CRM_Core_DAO {
           'required' => true,
         ) ,
         'field_name' => array(
-          'name' => 'label',
+          'name' => 'field_name',
           'type' => CRM_Utils_Type::T_STRING,
           'required' => true,
           'maxlength' => 255,
           'size' => CRM_Utils_Type::HUGE,
         ) ,
         'value' => array(
-          'name' => 'entity',
+          'name' => 'value',
           'type' => CRM_Utils_Type::T_STRING,
           'required' => true,
           'maxlength' => 255,
