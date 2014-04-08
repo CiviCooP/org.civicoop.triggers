@@ -1,12 +1,12 @@
 <?php
 
 /* 
- * This class holds DAO data for a trigger rule condition
+ * This class holds DAO data for a rule action
  * 
  * This is used to retrieve trigger and actions upon processing
  */
 
-class CRM_Triggers_DAO_TriggerRuleCondition extends CRM_Core_DAO {
+class CRM_Triggers_DAO_ActionRule extends CRM_Core_DAO {
   
   /**
    * static instance to hold the field values
@@ -20,7 +20,7 @@ class CRM_Triggers_DAO_TriggerRuleCondition extends CRM_Core_DAO {
    * empty definition for virtual function
    */
   static function getTableName() {
-    return 'civicrm_trigger_rule_condition';
+    return 'civicrm_action_rule';
   }
   
   /**
@@ -38,46 +38,32 @@ class CRM_Triggers_DAO_TriggerRuleCondition extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'required' => true,
         ) ,
-        'trigger_rule_id' => array(
-          'name' => 'trigger_rule_id',
-          'type' => CRM_Utils_Type::T_INT,
-          'required' => true,
-        ) ,
-        'field_name' => array(
-          'name' => 'field_name',
+        'label' => array(
+          'name' => 'label',
           'type' => CRM_Utils_Type::T_STRING,
           'required' => true,
           'maxlength' => 255,
           'size' => CRM_Utils_Type::HUGE,
         ) ,
-        'value' => array(
-          'name' => 'value',
+        'entity' => array(
+          'name' => 'entity',
           'type' => CRM_Utils_Type::T_STRING,
           'required' => true,
           'maxlength' => 255,
           'size' => CRM_Utils_Type::HUGE,
         ) ,
-        'operation' => array(
-          'name' => 'operation',
+        'action' => array(
+          'name' => 'action',
           'type' => CRM_Utils_Type::T_STRING,
           'required' => true,
           'maxlength' => 255,
           'size' => CRM_Utils_Type::HUGE,
         ) ,
-        'aggregate_function' => array(
-          'name' => 'aggregate_function',
-          'type' => CRM_Utils_Type::T_STRING,
-          'required' => true,
-          'maxlength' => 255,
-          'size' => CRM_Utils_Type::HUGE,
+        'params' => array(
+          'name' => 'params',
+          'type' => CRM_Utils_Type::T_TEXT,
         ) ,
-        'grouping_field' => array(
-          'name' => 'grouping_field',
-          'type' => CRM_Utils_Type::T_STRING,
-          'required' => true,
-          'maxlength' => 255,
-          'size' => CRM_Utils_Type::HUGE,
-        ) ,
+
       );
     }
     return self::$_fields;
@@ -94,12 +80,10 @@ class CRM_Triggers_DAO_TriggerRuleCondition extends CRM_Core_DAO {
     if (!(self::$_fieldKeys)) {
       self::$_fieldKeys = array(
         'id' => 'id',
-        'trigger_rule_id' => 'trigger_rule_id',
-        'field_name' => 'field_name',
-        'operation' => 'operation',
-        'value' => 'value',
-        'aggregate_function' => 'aggregate_function',
-        'grouping_field' => 'grouping_field',
+        'label' => 'label',
+        'entity' => 'entity',
+        'action' => 'action',
+        'params' => 'params',
       );
     }
     return self::$_fieldKeys;
