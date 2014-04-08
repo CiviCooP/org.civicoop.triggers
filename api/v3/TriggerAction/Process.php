@@ -40,8 +40,16 @@ function civicrm_api3_trigger_action_process($params) {
     
     //Retrieve the entities
     $entities = $actions->findEntities();
+    
+    $trigger = new CRM_Triggers_BAO_TriggerRule();
+    $trigger->id = $actions->trigger_rule_id;
+    $trigger->find(TRUE);
+    
+    $action = CRM_Triggers_BAO_ActionRule::findByActionId($actions->action_rule_id);
     while ($entities->fetch()) {
       //process the entity
+      $action->processEntity($entities, $trigger);
+      //add an activity type and add this entity to the processed table
     }
   }
   
