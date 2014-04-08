@@ -69,6 +69,34 @@ class CRM_Triggers_BAO_TriggerAction extends CRM_Triggers_DAO_TriggerAction {
     
     throw new CRM_Triggers_Exception_QueryError("Query error on finding entities");
   }
+    /**
+     * Function to get conditions
+     * 
+     * @author Erik Hommel (CiviCooP) <erik.hommel@civicoop.org>
+     * @date 8 Apr 2014
+     * @param array $params name/value pairs with field names/values
+     * @return array $result found rows with data
+     * @access public
+     * @static
+     */
+    public static function getValues($params) {
+        $result = array();
+        $triggerAction = new CRM_Triggers_BAO_TriggerAction();
+        if (!empty($params)) {
+            $fields = self::fields();
+            foreach ($params as $paramKey => $paramValue) {
+                if (isset($fields[$paramKey])) {
+                    $triggerAction->$paramKey = $paramValue;
+                }
+            }
+        }
+        $triggerAction->find();
+        while ($triggerAction->fetch()) {
+            self::storeValues($triggerAction, $row);
+            $result[$row['id']] = $row;
+        }
+        return $result;
+    }
   
 }
 
