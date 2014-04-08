@@ -22,13 +22,13 @@ class CRM_Triggers_BAO_TriggerRuleCondition extends CRM_Triggers_DAO_TriggerRule
     if ($is_aggregate) {
       $having = $this->aggregate_function ."(`".$this->field_name."`)";
       $having .= " ".$this->operation." ";
-      $having .= " '".$this->value."'";
+      $having .= " '".$dao->escape($this->value)."'";
       $dao->having($having);
       $dao->groupBy($this->grouping_field);
     } else {
       $clause = "`".$this->field_name."`";
       $clause .= " ".$this->operation." ";
-      $clause .= " '".$this->value."'";
+      $clause .= " '".$dao->escape($this->value)."'";
       $dao->whereAdd($clause);
     }
   }
