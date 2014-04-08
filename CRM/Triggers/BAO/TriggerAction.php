@@ -47,7 +47,7 @@ class CRM_Triggers_BAO_TriggerAction extends CRM_Triggers_DAO_TriggerAction {
    */
   protected function validate() {
     if (empty($this->trigger_rule_id)) {
-      throw new CRM_Triggers_Exception_InvalidTriggerActionEntity("Trigger rule ID is not set");
+      throw new CRM_Triggers_Exception_InvalidTriggerAction("Trigger rule ID is not set");
     }
   }
   
