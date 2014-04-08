@@ -23,11 +23,6 @@ class CRM_Triggers_Form_TriggerRules extends CRM_Core_Form {
          * if action is not add, store trigger_rule_id in $this->_id
          * and retrieve conditions for trigger
          */
-        $test = CRM_Triggers_BAO_TriggerRuleCondition::getValues(array('field_name' => 'is_active'));
-        CRM_Core_Error::debug('test na fetch', $test);
-        exit();
-        
-        
         if ($this->_action != CRM_Core_Action::ADD) {
             $this->_id = CRM_Utils_Request::retrieve('tid', 'Integer', $this);
             $conditionParams = array('trigger_rule_id', $this->_id);
