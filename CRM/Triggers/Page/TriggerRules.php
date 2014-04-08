@@ -43,7 +43,7 @@ class CRM_Triggers_Page_TriggerRules extends CRM_Core_Page {
             }            
             $rowActions = array();
             $viewUrl = CRM_Utils_System::url('civicrm/triggerrules', 'action=view&reset=1&tid='.$daoTriggers->id, true);
-            $editUrl = CRM_Utils_System::url('civicrm/triggerrules', 'action=edit&reset=1&tid='.$daoTriggers->id, true);
+            $editUrl = CRM_Utils_System::url('civicrm/triggerrules', 'action=update&reset=1&tid='.$daoTriggers->id, true);
             $deleteUrl = CRM_Utils_System::url('civicrm/triggerrules', 'action=delete&reset=1&tid='.$daoTriggers->id, true);
             $rowActions[] = '<a class="action-item" title="View trigger details" href="'.$viewUrl.'">View</a>';
             $rowActions[] = '<a class="action-item" title="Edit trigger" href="'.$editUrl. '">Edit</a>';

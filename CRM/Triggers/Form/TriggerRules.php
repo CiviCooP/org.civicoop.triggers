@@ -17,21 +17,10 @@ require_once 'CRM/Core/Form.php';
  * @see http://wiki.civicrm.org/confluence/display/CRMDOC43/QuickForm+Reference
  */
 class CRM_Triggers_Form_TriggerRules extends CRM_Core_Form {
-    protected $_id = 0;
+    protected $_entities = array();
     function buildQuickForm() {
-        /*
-         * if action is not add, store trigger_rule_id in $this->_id
-         * and retrieve conditions for trigger
-         */
-        if ($this->_action != CRM_Core_Action::ADD) {
-            $this->_id = CRM_Utils_Request::retrieve('tid', 'Integer', $this);
-            $conditionParams = array('trigger_rule_id', $this->_id);
-            $triggerConditions = CRM_Triggers_BAO_TriggerRuleCondition::get($conditionParams);
-            $this->assign('conditionRows', $triggerConditions);
-            $conditionFields = CRM_Triggers_BAO_TriggerRuleCondition::fields();
-            $conditionHeaders = array('Field Name', 'Operation', 'Value', 'Aggregate Function', 'Grouping Field');
-            $this->assign('conditionHeaders', $conditionHeaders);
-        }
+        
+        $this->preProcess();
         /*
          * add form elements
          */
@@ -40,8 +29,7 @@ class CRM_Triggers_Form_TriggerRules extends CRM_Core_Form {
                 'maxlength' => 255,
                 'size' => CRM_Utils_Type::HUGE,
             ), true);
-        $validEntities = array('Activity', 'Contribution', 'GroupContact');
-        $this->add('select', 'entity', ts('Entity'), $validEntities, true);
+        $this->add('select', 'entity', ts('Entity'), $this->_entities, true);
         $validActions = array('Create', 'Delete', 'Read', 'Update');
         /**
          * EH 8 Apr 2014: not required as long as we do cron processing only
@@ -62,32 +50,55 @@ class CRM_Triggers_Form_TriggerRules extends CRM_Core_Form {
             ),
             )
         );
-        CRM_Utils_System::setTitle(ts('Trigger'));
         $this->assign('elementNames', $this->getRenderableElementNames());
         parent::buildQuickForm();
     }
+    function preProcess() {
+        /*
+         * set user context to return to trigger list
+         */
+        $session = CRM_Core_Session::singleton();
+        $session->pushUserContext(CRM_Utils_System::url('civicrm/triggerruleslist'));
+        $this->_entities = array('Activity', 'Contribution', 'GroupContact');
+
+        /*
+         * if action is not add, store trigger_rule_id in $this->_id
+         * and retrieve conditions for trigger
+         */
+        if ($this->_action == CRM_Core_Action::UPDATE || $this->_action == CRM_Core_Action::VIEW) {
+            $this->_id = CRM_Utils_Request::retrieve('tid', 'Integer', $this);
+            $conditionParams = array('trigger_rule_id', $this->_id);
+            $triggerConditions = CRM_Triggers_BAO_TriggerRuleCondition::getValues($conditionParams);
+            $this->assign('conditionRows', $triggerConditions);
+            $conditionHeaders = array('Field Name', 'Operation', 'Value', 'Aggregate Function', 'Grouping Field');
+            $this->assign('conditionHeaders', $conditionHeaders);
+        }
+        switch($this->_action) {
+            case CRM_Core_Action::ADD:
+                $pageTitle = "New Trigger";
+                break;
+            case CRM_Core_Action::VIEW:
+                $pageTitle = "View Trigger";
+                break;
+            case CRM_Core_Action::UPDATE:
+                $pageTitle = "Update Trigger";
+                break;
+            default:
+                $pageTitle = "Trigger";
+                break;
+        }
+        CRM_Utils_System::setTitle(ts($pageTitle));
+
+        $this->setDefaultValues();
+    }
     function postProcess() {
         $values = $this->exportValues();
-        $options = $this->getColorOptions();
-        CRM_Core_Session::setStatus(ts('You picked color "%1"', array(
-          1 => $options[$values['favorite_color']]
-        )));
+        CRM_Core_Error::debug("values", $values);
+        CRM_Core_Error::debug("this", $this);
+        exit();
         parent::postProcess();
     }
 
-    function getColorOptions() {
-        $options = array(
-            '' => ts('- select -'),
-            '#f00' => ts('Red'),
-            '#0f0' => ts('Green'),
-            '#00f' => ts('Blue'),
-            '#f0f' => ts('Purple'),
-        );
-        foreach (array('1','2','3','4','5','6','7','8','9','a','b','c','d','e') as $f) {
-            $options["#{$f}{$f}{$f}"] = ts('Grey (%1)', array(1 => $f));
-        }
-        return $options;
-    }
     /**
      * Get the fields/elements defined in this form.
      *
@@ -106,5 +117,26 @@ class CRM_Triggers_Form_TriggerRules extends CRM_Core_Form {
             }
         }
         return $elementNames;
+    }
+    /**
+     * Function to set default values
+     * 
+     */
+    function setDefaultValues() {
+        $defaults = array();
+        if (isset($this->_id)) {
+            $triggerRule = CRM_Triggers_BAO_TriggerRule::getByTriggerRuleId($this->_id);
+            if (isset($triggerRule['id'])) {
+                $defaults['id'] = $triggerRule['id'];
+            }
+            if (isset($triggerRule['label'])) {
+                $defaults['label'] = $triggerRule['label'];
+            }
+            if (isset($triggerRule['entity'])) {
+                $entityValue = CRM_Utils_Array::key($triggerRule['entity'], $this->_entities);
+                $defaults['entity'] = $entityValue;
+            }
+        }
+        return $defaults;
     }
 }

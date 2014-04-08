@@ -47,6 +47,27 @@ class CRM_Triggers_BAO_TriggerRule extends CRM_Triggers_DAO_TriggerRule {
         }
         return $result;
     }
+    /**
+     * Function to get single trigger with trigger_rule_id
+     * 
+     * @author Erik Hommel (CiviCooP) <erik.hommel@civicoop.org>
+     * @date 8 Apr 2014
+     * @param int $triggerRuleId
+     * @return array $result found row with data
+     * @access public
+     * @static
+     */
+    public static function getByTriggerRuleId($triggerRuleId) {
+        $result = array();
+        if (empty($triggerRuleId)) {
+            return $result;
+        }
+        $triggerRule = new CRM_Triggers_BAO_TriggerRule();
+        $triggerRule->id = $triggerRuleId;
+        $triggerRule->find(true);
+        self::storeValues($triggerRule, $result);
+        return $result;
+    }
   
 }
 

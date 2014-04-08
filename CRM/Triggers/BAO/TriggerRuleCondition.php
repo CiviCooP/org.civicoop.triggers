@@ -28,6 +28,7 @@ class CRM_Triggers_BAO_TriggerRuleCondition extends CRM_Triggers_DAO_TriggerRule
         }
         $condition->find();
         while ($condition->fetch()) {
+            $row = array();
             self::storeValues($condition, $row);
             $result[$row['id']] = $row;
         }

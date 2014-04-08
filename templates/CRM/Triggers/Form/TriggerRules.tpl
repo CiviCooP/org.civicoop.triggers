@@ -13,13 +13,17 @@
 
             {foreach from=$elementNames item=elementName}
               <div class="crm-section">
-                <div class="label">{$form.$elementName.label}</div>
-                <div class="content">{$form.$elementName.html}</div>
-                <div class="clear"></div>
+                  <div class="label">{$form.$elementName.label}</div>
+                  <div class="content">{$form.$elementName.html}</div>
+                  <div class="clear"></div>
               </div>
             {/foreach}
         </tbody>
     </table>
+    {* include condition details if they are there *}
+    {if isset($conditionRows)}
+        {include file="CRM/Triggers/Page/CurrentConditions.tpl"}
+    {/if}
 
     {* FOOTER *}
     <div class="crm-submit-buttons">

@@ -5,6 +5,7 @@
             {foreach from=$conditionHeaders item=rowHeader}
                 <th class="sorting-disabled">{$rowHeader}</th>
             {/foreach}
+            <th class="sorting-disabled"></th>
         </tr>
     </thead>
     <tbody>
@@ -15,6 +16,8 @@
                 <td>{$row.field_name}</td>
                 <td>{$row.operation}</td>
                 <td>{$row.value}</td>
+                <td>{$row.aggregate_function}</td>
+                <td>{$row.grouping_field}</td>
                 <td>
                     <span>
                         <a class="action-item" title="Delete condition" href="{$deleteConditionUrl}">Delete</a>
