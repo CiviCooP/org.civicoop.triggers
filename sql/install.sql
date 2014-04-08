@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS `civicrm_trigger_rule` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `label` varchar(255) NOT NULL,
   `entity` varchar(255) NOT NULL,
-  `operation` varchar(255) NOT NULL,
+  `operation` varchar(255),
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 

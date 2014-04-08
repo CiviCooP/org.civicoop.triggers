@@ -23,15 +23,24 @@ function _civicrm_api3_trigger_action_process_spec(&$spec) {
  */
 function civicrm_api3_trigger_action_process($params) {
   $actions = CRM_Triggers_BAO_TriggerAction::findForProcessing(FALSE);
+  $messages = array();
+  $count = 0;
   while ($actions->fetch()) {
     //process this trigger action
     //here comes all the logic etc....
     
     //this consists of the following steps
     //1. retrieve the entities which match the condition of the trigger
-    //2. prepare the api action with the entity
-    //3. set next run day
+    //For every entity
+    //   2. prepare the api action with the entity
+    //   3. create activity of type: TriggerAction for this trigger action and entity
+    //   
+    //4. set next run day
     
   }
+  
+  $params['message'] = 'Processed '.$count.' triggers. '.implode(' ', $messages);
+  return civicrm_api3_create_success($params);
+  
 }
 
