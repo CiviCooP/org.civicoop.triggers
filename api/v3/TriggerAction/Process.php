@@ -37,6 +37,12 @@ function civicrm_api3_trigger_action_process($params) {
     //   
     //4. set next run day
     
+    
+    //Retrieve the entities
+    $entities = $actions->findEntities();
+    while ($entities->fetch()) {
+      //process the entity
+    }
   }
   
   $params['message'] = 'Processed '.$count.' triggers. '.implode(' ', $messages);
