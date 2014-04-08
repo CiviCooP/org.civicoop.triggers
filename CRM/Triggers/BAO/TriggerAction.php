@@ -97,6 +97,22 @@ class CRM_Triggers_BAO_TriggerAction extends CRM_Triggers_DAO_TriggerAction {
         }
         return $result;
     }
+    
+    /**
+     * Reschedule this trigger/action combination and set last run date
+     */
+    public function reschedule() {
+      $this->last_run = date('YmdHis');
+
+      if (strlen($this->schedule)) {
+        $date = new DateTime();
+        $interval = DateInterval::createFromDateString($this->schedule);
+        $date->add($interval);
+        $this->next_run = $date->format('YmdHis');
+      }
+      
+      $this->save();
+    }
   
 }
 

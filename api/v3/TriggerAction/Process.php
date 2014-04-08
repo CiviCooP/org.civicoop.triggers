@@ -50,14 +50,16 @@ function civicrm_api3_trigger_action_process($params) {
     while ($entities->fetch()) {
       //process the entity
       if ($action->processEntity($entities, $trigger)) {
-        $processedEntityCount ++;
-        //add an activity type and add this entity to the processed table
-        
-        //save the entity as processed
+        //add an activity type and add this entity to the processed table        
+        //we do that through the processed trigger BAO
         CRM_Triggers_BAO_ProcessedTrigger::processTrigger($entities, $trigger, $actions);
+        $processedEntityCount ++;
       }
-      
     }
+    
+    //reschedule the trigger-action
+    $actions->reschedule();
+    
     $count ++;
     $messages[] = 'Trigger "'.$trigger->label.'" processed '.$processedEntityCount.' entities';
   }
