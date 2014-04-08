@@ -21,6 +21,19 @@ class CRM_Triggers_Upgrader extends CRM_Triggers_Upgrader_Base {
   public function uninstall() {
    $this->executeSqlFile('sql/uninstall.sql');
   }
+  
+  /**
+   * Upgrade 1001
+   *
+   * @return TRUE on success
+   * @throws Exception
+   */ 
+  public function upgrade_1001() {
+    $this->ctx->log->info('Applying update 1001');
+    // this path is relative to the extension base dir
+    $this->executeSqlFile('sql/upgrade_1001.sql');
+    return TRUE;
+  }
 
   /**
    * Example: Run a simple query when a module is enabled
