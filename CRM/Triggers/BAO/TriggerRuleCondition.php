@@ -37,6 +37,13 @@ class CRM_Triggers_BAO_TriggerRuleCondition extends CRM_Triggers_DAO_TriggerRule
       $clause .= " '".$dao->escape($this->value)."'";
       $dao->whereAdd($clause);
     }
+    
+    $hooks = CRM_Utils_Hook::singleton();
+    $hooks->invoke(2,
+      $this, $dao, CRM_Utils_Hook::$_nullObject, CRM_Utils_Hook::$_nullObject, CRM_Utils_Hook::$_nullObject,
+      'civicrm_trigger_condition_parse'
+      );
+    
   }
   
   public static function findByTriggerRuleId($trigger_rule_id, $fetchFirst=FALSE) {
