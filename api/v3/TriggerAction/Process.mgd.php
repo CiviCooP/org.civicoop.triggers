@@ -17,6 +17,7 @@ return array (
       'api_entity' => 'TriggerAction',
       'api_action' => 'Process',
       'parameters' => '',
+      'is_active' => '0',
     ),
   ),
 );
