@@ -20,7 +20,7 @@ class CRM_Triggers_BAO_ProcessedTrigger extends CRM_Triggers_DAO_ProcessedTrigge
    * @param CRM_Triggers_BAO_TriggerAction $triger_action
    * @param type $contacts
    */
-  public static function processTrigger(CRM_Core_DAO $entity, CRM_Triggers_BAO_TriggerRule $trigger_rule, CRM_Triggers_BAO_TriggerAction $triger_action, $contacts) {
+  public static function processTrigger(CRM_Core_DAO $entity, CRM_Triggers_BAO_TriggerRule $trigger_rule, CRM_Triggers_BAO_TriggerAction $triger_action, CRM_Triggers_BAO_ActionRule $action_rule, $contacts) {
     $processed = new CRM_Triggers_DAO_ProcessedTrigger();
     $processed->date_processed = date('YmdHis');
     $processed->entity = $trigger_rule->entity;
@@ -39,7 +39,8 @@ class CRM_Triggers_BAO_ProcessedTrigger extends CRM_Triggers_DAO_ProcessedTrigge
       $params['source_record_id'] = $processed->id;
       $params['subject'] = ts('Processed trigger "'.$trigger_rule->label.'"');
       $params['status_id'] = 2; //completed
-      $params['target_contact_id'] = implode(",", $contactIds);
+      //$params['target_contact_id'] = implode(",", $contactIds);
+      $params['target_contact_id'] = $contactIds;
       
       civicrm_api3('Activity', 'create', $params);
     }

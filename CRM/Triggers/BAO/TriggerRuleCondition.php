@@ -42,11 +42,13 @@ class CRM_Triggers_BAO_TriggerRuleCondition extends CRM_Triggers_DAO_TriggerRule
   public function parseCondition(CRM_Core_DAO $dao) {
     
     //check if field exist in DAO
-    $fields = $dao->fields();
-    if (!isset($fields[$this->field_name])) {
+    $daoClass = get_class($dao);
+    $fields = $daoClass::fields();
+    if (!isset($fields[$this->field_name]) || !isset($fields[$this->field_name]['name'])) {
       throw new CRM_Triggers_Exception_InvalidCondition("Invalid field '".$this->field_name."'");
     }
-    
+    $sqlFieldName = $fields[$this->field_name]['name'];
+
     //determine if this condition is an aggregation
     $is_aggregate = false;
     if (!empty($this->aggregate_function) && !empty($this->grouping_field)) {
@@ -54,13 +56,19 @@ class CRM_Triggers_BAO_TriggerRuleCondition extends CRM_Triggers_DAO_TriggerRule
     }
     
     if ($is_aggregate) {
-      $having = $this->aggregate_function ."(`".$this->field_name."`)";
+      $having = $this->aggregate_function ."(`".$sqlFieldName."`)";
       $having .= " ".$this->operation." ";
       $having .= " '".$dao->escape($this->value)."'";
       $dao->having($having);
-      $dao->groupBy($this->grouping_field);
+      
+      if (!isset($fields[$this->grouping_field]) || !isset($fields[$this->grouping_field]['name'])) {
+        throw new CRM_Triggers_Exception_InvalidCondition("Invalid field '".$this->grouping_field."'");
+      }
+      $sqlGroupingFieldName = $fields[$this->grouping_field]['name'];
+      $dao->groupBy($sqlGroupingFieldName);
+      
     } else {
-      $clause = "`".$this->field_name."`";
+      $clause = "`".$sqlFieldName."`";
       $clause .= " ".$this->operation." ";
       $clause .= " '".$dao->escape($this->value)."'";
       $dao->whereAdd($clause);

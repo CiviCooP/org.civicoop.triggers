@@ -45,7 +45,8 @@ class CRM_Triggers_Utils {
       return array($objRef); //return the current object
     }
     
-    $fields = $objRef->fields();
+    $class = get_class($objRef);
+    $fields = $class::fields();
     $contact_ids = array();
     if ($objRef instanceof CRM_Activity_DAO_Activity) {
       //retrieve the targets of this activity

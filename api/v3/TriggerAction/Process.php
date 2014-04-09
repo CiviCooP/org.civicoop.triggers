@@ -49,7 +49,7 @@ function civicrm_api3_trigger_action_process($params) {
     $processedEntityCount = 0;
     while ($entities->fetch()) {
       //process the entity
-      $processCount = $action->processEntity($entities, $trigger);
+      $processCount = $action->processEntity($entities, $trigger, $actions);
       
       if ($processCount) {
         $processedEntityCount = $processedEntityCount + $processCount;

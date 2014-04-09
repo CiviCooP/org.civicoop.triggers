@@ -106,8 +106,7 @@ class CRM_Triggers_BAO_TriggerAction extends CRM_Triggers_DAO_TriggerAction {
 
       if (strlen($this->schedule)) {
         $date = new DateTime();
-        $interval = DateInterval::createFromDateString($this->schedule);
-        $date->add($interval);
+        $date->modify($this->schedule);
         $this->next_run = $date->format('YmdHis');
       }
       
