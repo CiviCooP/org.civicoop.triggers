@@ -18,4 +18,10 @@
     <title>TriggerRules</title>
     <access_arguments>access CiviCRM</access_arguments>
   </item>
+  <item>
+    <path>civicrm/conditiondelete</path>
+    <page_callback>CRM_Triggers_Page_TriggerRuleConditionDelete</page_callback>
+    <title>TriggerRuleConditionDelete</title>
+    <access_arguments>access CiviCRM</access_arguments>
+  </item>
 </menu>

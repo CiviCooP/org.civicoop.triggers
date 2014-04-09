@@ -24,6 +24,10 @@
             {/foreach}
         </tbody>
     </table>
+    {* allow add condition rules if action is edit *}
+    {if $action eq 2}
+        {include file="CRM/Triggers/Form/NewCondition.tpl"}
+    {/if}
     {* include condition details if they are there *}
     {if isset($conditionRows)}
         {include file="CRM/Triggers/Page/CurrentConditions.tpl"}

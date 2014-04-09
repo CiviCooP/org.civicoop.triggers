@@ -94,6 +94,25 @@ class CRM_Triggers_BAO_TriggerRule extends CRM_Triggers_DAO_TriggerRule {
         self::storeValues($triggerRule, $result);
         return $result;
     }
+    /**
+     * Function to delete trigger rule
+     * 
+     * @author Erik Hommel (CiviCooP) <erik.hommel@civicoop.org>
+     * @date 9 Apr 2014
+     * @param int $triggerRuleId 
+     * @return boolean
+     * @access public
+     * @static
+     */
+    public static function deleteById($triggerRuleId) {
+        if (empty($triggerRuleId)) {
+            throw new Exception('TriggerRuleId can not be empty when attempting to delete one');
+        }
+        $triggerRule = new CRM_Triggers_BAO_TriggerRule();
+        $triggerRule->id = $triggerRuleId;
+        $triggerRule->delete();
+        return TRUE;
+    }
   
 }
 

@@ -20,7 +20,7 @@
                 <td>{$row.grouping_field}</td>
                 <td>
                     <span>
-                        <a class="action-item" title="Delete condition" href="{$deleteConditionUrl}">Delete</a>
+                        <a class="action-item" title="Delete condition" href="{$row.delete}">Delete</a>
                     </span>
                 </td>
             </tr>
