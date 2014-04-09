@@ -13,7 +13,6 @@ class CRM_Triggers_Upgrader extends CRM_Triggers_Upgrader_Base {
    */
   public function install() {
     $this->executeSqlFile('sql/install.sql');
-    $this->executeSqlFile('sql/example.sql');
   }
 
   /**
@@ -59,19 +58,6 @@ class CRM_Triggers_Upgrader extends CRM_Triggers_Upgrader_Base {
     $this->ctx->log->info('Applying update 1003');
     // this path is relative to the extension base dir
     $this->executeSqlFile('sql/upgrade_1003.sql');
-    return TRUE;
-  }
-  
-  /**
-   * Upgrade 1004: install example data
-   *
-   * @return TRUE on success
-   * @throws Exception
-   */ 
-  public function upgrade_1004() {
-    $this->ctx->log->info('Applying update 1004: example data');
-    // this path is relative to the extension base dir
-    $this->executeSqlFile('sql/example.sql');
     return TRUE;
   }
 
