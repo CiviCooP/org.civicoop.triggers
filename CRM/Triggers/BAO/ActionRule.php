@@ -9,21 +9,40 @@ class CRM_Triggers_BAO_ActionRule extends CRM_Triggers_DAO_ActionRule {
    * Process the action for the given entity ($objRef)
    * @param CRM_Core_DAO $objRef
    */
-  public function processEntity(CRM_Core_DAO $objRef, CRM_Triggers_BAO_TriggerRule $trigger_rule) {
-    $params = $this->parseParams($objRef, $trigger_rule);
+  public function processEntity(CRM_Core_DAO $objRef, CRM_Triggers_BAO_TriggerRule $trigger_rule, CRM_Triggers_BAO_TriggerAction $trigger_action) {
+    //set the objects array for processing
+    $objects[strtolower($trigger_rule->entity)] = $objRef;
     
-    civicrm_api3($this->entity, $this->action, $params);
+    //retrieve contacts from the entity
+    $contacts = CRM_Triggers_Utils::getContactsFromEntity($objRef);
+    $processCount = 0;
+    if ($this->process_contacts && count($contacts)) {
+      foreach($contacts as $contact) {
+        $objects['Contact'] = $contact;
+        $params = $this->parseParams($objects, $trigger_rule);
+        civicrm_api3($this->entity, $this->action, $params);
+        $processCount++;
+      }
+    } else {
+      $params = $this->parseParams($objects, $trigger_rule);
+      civicrm_api3($this->entity, $this->action, $params);
+      $processCount++;
+    }
     
-    return true;
+    //add an activity type and add this entity to the processed table        
+      //we do that through the processed trigger BAO
+    CRM_Triggers_BAO_ProcessedTrigger::processTrigger($objRef, $trigger_rule, $trigger_action, $this, $contacts);
+    
+    return $processCount;
   }
   
   /**
    * returns an array to be used with the api calls
    * 
-   * @param CRM_Core_DAO $objRef
+   * @param array $objects array of objects identified by lower case entity name 'e.g. contribution'.
    * @return array
    */
-  protected function parseParams(CRM_Core_DAO $objRef, CRM_Triggers_BAO_TriggerRule $trigger_rule) {
+  protected function parseParams($objects, CRM_Triggers_BAO_TriggerRule $trigger_rule) {
     $return = array();
     
     $p = explode("&", $this->params);
@@ -33,11 +52,16 @@ class CRM_Triggers_BAO_ActionRule extends CRM_Triggers_DAO_ActionRule {
       if (isset($strArr[0]) && isset($strArr[1]));
       $params[$strArr[0]] = $strArr[1];
     }
-    $fields = $objRef->fields();
+    
+    $fields = array();
+    foreach($objects as $entity => $obj) {
+      $class = get_class($obj);
+      $fields[$entity] = $class::fields();
+    }
     
     $hooks = CRM_Utils_Hook::singleton();
     $hooks->invoke(5,
-      $params, $return, $objRef, $trigger_rule, $this,
+      $params, $return, $objects, $trigger_rule, $this,
       'civicrm_trigger_action_parse_params'
       );
     
@@ -58,9 +82,9 @@ class CRM_Triggers_BAO_ActionRule extends CRM_Triggers_DAO_ActionRule {
           throw new CRM_Triggers_Exception_DAO_Not_Found("Entity ".$entityName." has no DAO");
         }
         //check if objRef is an instanceof $entityType
-        if ($objRef instanceof $entityType) {      
-          if (isset($fields[$fieldName])) {
-            $return[$key] = $objRef->$fieldName;
+        if (isset($objects[$entityName]) && $objects[$entityName] instanceof $entityType) {      
+          if (isset($fields[$entityName]) && isset($fields[$entityName][$fieldName])) {
+            $return[$key] = $objects[$entityName]->$fieldName;
           }
         }
       } 
@@ -69,9 +93,15 @@ class CRM_Triggers_BAO_ActionRule extends CRM_Triggers_DAO_ActionRule {
       if (!isset($return[$key]) && preg_match("/{(.*)}/", $val, $matches)) {
         //value looks like {field}
         //check if field exist on objRef.
-        $fieldName = $matches[1];
-        if (isset($fields[$fieldName])) {
-          $return[$key] = $objRef->$fieldName;
+        foreach($fields as $entityName => $entityFields) {
+          foreach($entityFields as $fieldName => $field) {
+            if ($fieldName == $matches[1]) {
+              if (isset($objects[$entityName])) {
+                $return[$key] = $objects[$entityName]->$fieldName;
+                break 2;
+              }
+            }
+          }
         }
       }
       
