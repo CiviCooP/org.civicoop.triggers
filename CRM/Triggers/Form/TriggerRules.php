@@ -17,7 +17,11 @@ require_once 'CRM/Core/Form.php';
  * @see http://wiki.civicrm.org/confluence/display/CRMDOC43/QuickForm+Reference
  */
 class CRM_Triggers_Form_TriggerRules extends CRM_Core_Form {
+    
     protected $_entities = array();
+    protected $_entity = null;
+    protected $_entityFields = array();
+    
     function buildQuickForm() {
         
         $this->preProcess();
@@ -38,7 +42,34 @@ class CRM_Triggers_Form_TriggerRules extends CRM_Core_Form {
                     'size' => CRM_Utils_Type::HUGE,
                 ), true);            
         }
-        $this->add('select', 'entity', ts('Entity'), $this->_entities, true);
+        if ($this->_action == CRM_Core_Action::ADD) {
+            $this->add('select', 'entity', ts('Entity'), $this->_entities, true);
+        } else {
+            $this->add('text', 'entity', ts('Entity'),
+                array(
+                    'readonly'  =>  'readonly'
+                ), true);
+        }
+        /*
+         * set new Condition elements if action is update
+         */
+        if ($this->_action == CRM_Core_Action::UPDATE) {
+            $triggerRule = CRM_Triggers_BAO_TriggerRule::getByTriggerRuleId($this->_id);
+            if (isset($triggerRule['entity'])) {
+                $this->_entity = $triggerRule['entity'];
+            }
+            $this->_entityFields = $this->_listEntityFields();
+            /*
+             * add element for condition without label, so they do not
+             * occur in the rendereableElements on the main form
+             */
+            $this->add('select', 'field_name', '', $this->_entityFields, true);
+            $this->add('text', 'operation');
+            $this->add('text', 'value');
+            $this->add('text', 'aggregate_function');
+            $this->add('text', 'grouping_field');
+        }
+        $this->setDefaultValues();
         $validActions = array('Create', 'Delete', 'Read', 'Update');
         /**
          * EH 8 Apr 2014: not required as long as we do cron processing only
@@ -73,9 +104,9 @@ class CRM_Triggers_Form_TriggerRules extends CRM_Core_Form {
          * if action is not add, store trigger_rule_id in $this->_id
          * and retrieve conditions for trigger
          */
-        if ($this->_action == CRM_Core_Action::UPDATE || $this->_action == CRM_Core_Action::VIEW) {
+        if ($this->_action != CRM_Core_Action::ADD) {
             $this->_id = CRM_Utils_Request::retrieve('tid', 'Integer', $this);
-            $conditionParams = array('trigger_rule_id', $this->_id);
+            $conditionParams = array('trigger_rule_id' => $this->_id);
             $triggerConditions = CRM_Triggers_BAO_TriggerRuleCondition::getValues($conditionParams);
             $this->assign('conditionRows', $triggerConditions);
             $conditionHeaders = array('Field Name', 'Operation', 'Value', 'Aggregate Function', 'Grouping Field');
@@ -99,18 +130,35 @@ class CRM_Triggers_Form_TriggerRules extends CRM_Core_Form {
                 break;
         }
         CRM_Utils_System::setTitle(ts($pageTitle));
-        /*
-         * if action is update, give possibility to add condition
-         */
-        $this->setDefaultValues();
     }
     function postProcess() {
         $values = $this->exportValues();
-        $saveParams['label'] = $values['label'];
-        $saveParams['entity'] = CRM_Utils_Array::value($values['entity'], $this->_entities);
-        $savedTriggerRule = CRM_Triggers_BAO_TriggerRule::add($saveParams);
+        if ($this->_action == CRM_Core_Action::UPDATE) {
+            $saveTriggerParams['id'] = $this->_id;
+        }
+        $saveTriggerParams['label'] = $values['label'];
+        $saveTriggerParams['entity'] = CRM_Utils_Array::value($values['entity'], $this->_entities);
+        $savedTriggerRule = CRM_Triggers_BAO_TriggerRule::add($saveTriggerParams);
+        $session = CRM_Core_Session::singleton();
         if ($this->_action == CRM_Core_Action::ADD) {
-            $session->pushUserContext(CRM_Utils_System::url('civicrm/triggerruleconditions', 'action=add&tid=', true));
+            $session->setStatus('Trigger Saved', 'Saved', 'success');
+            $session->pushUserContext(CRM_Utils_System::url('civicrm/triggerrules', 'action=update&tid='.$savedTriggerRule['id'], true));
+        }
+        if ($this->_action == CRM_Core_Action::UPDATE) {
+            if ($values['_qf_TriggerRules_next'] == 'Add Condition') {
+                $session->setStatus('Condition Added', 'Saved', 'success');
+                $saveConditionParams['trigger_rule_id'] = $savedTriggerRule['id'];
+                $saveConditionParams['field_name'] = CRM_Utils_Array::value($values['field_name'], $this->_entityFields);
+                $saveConditionParams['operation'] = $values['operation'];
+                $saveConditionParams['value'] = $values['value'];
+                $saveConditionParams['aggregate_function'] = $values['aggregate_function'];
+                $saveConditionParams['grouping_field'] = $values['grouping_field'];                
+                CRM_Triggers_BAO_TriggerRuleCondition::add($saveConditionParams);
+                $session->pushUserContext(CRM_Utils_System::url('civicrm/triggerrules', 'action=update&tid='.$savedTriggerRule['id'], true));            
+            } else {
+                $session->setStatus('Trigger and Conditions Saved', 'Saved', 'success');
+                $session->pushUserContext(CRM_Utils_System::url('civicrm/triggerruleslist', '', true));
+            }
         }
         parent::postProcess();
     }
@@ -149,10 +197,25 @@ class CRM_Triggers_Form_TriggerRules extends CRM_Core_Form {
                 $defaults['label'] = $triggerRule['label'];
             }
             if (isset($triggerRule['entity'])) {
-                $entityValue = CRM_Utils_Array::key($triggerRule['entity'], $this->_entities);
+                if ($this->_action == CRM_Core_Action::ADD) {
+                    $entityValue = CRM_Utils_Array::key($triggerRule['entity'], $this->_entities);
+                } else {
+                    $entityValue = $triggerRule['entity'];
+                }
                 $defaults['entity'] = $entityValue;
             }
         }
         return $defaults;
+    }
+
+    private function _listEntityFields() {
+        if (isset($this->_entity) && !empty($this->_entity)) {
+            $daoEntity = CRM_Triggers_BAO_TriggerRule::getEntityDAO($this->_entity);
+            $fields = $daoEntity->fields();
+            foreach ($fields as $field) {
+                $result[] = $field['name'];
+            }
+            return $result;
+        }
     }
 }
