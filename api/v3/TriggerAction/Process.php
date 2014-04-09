@@ -49,11 +49,10 @@ function civicrm_api3_trigger_action_process($params) {
     $processedEntityCount = 0;
     while ($entities->fetch()) {
       //process the entity
-      if ($action->processEntity($entities, $trigger)) {
-        //add an activity type and add this entity to the processed table        
-        //we do that through the processed trigger BAO
-        CRM_Triggers_BAO_ProcessedTrigger::processTrigger($entities, $trigger, $actions);
-        $processedEntityCount ++;
+      $processCount = $action->processEntity($entities, $trigger);
+      
+      if ($processCount) {
+        $processedEntityCount = $processedEntityCount + $processCount;
       }
     }
     

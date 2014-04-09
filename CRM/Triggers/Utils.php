@@ -35,22 +35,35 @@ class CRM_Triggers_Utils {
   }
   
   /**
-   * Returns the contact ID belonging to an entity
+   * Returns the contacts belonging to an entity
    * 
    * @param CRM_Core_DAO $objRef
-   * @return null
+   * @return array
    */
-  public static function getContactIdFromEntity(CRM_Core_DAO $objRef) {
+  public static function getContactsFromEntity(CRM_Core_DAO $objRef) {
     if ($objRef instanceof CRM_Contact_DAO_Contact) {
-      return $objRef->id;
+      return array($objRef); //return the current object
     }
     
     $fields = $objRef->fields();
-    if (isset($fields['contact_id'])) {
-      return $objRef->contact_id;
+    $contact_ids = array();
+    if ($objRef instanceof CRM_Activity_DAO_Activity) {
+      //retrieve the targets of this activity
+      $contact_ids = CRM_Activity_BAO_ActivityTarget::retrieveTargetIdsByActivityId($objRef->id);
+    } elseif (isset($fields['contact_id'])) {
+      $contact_ids = array($objRef->contact_id);
     }
     
-    return null; //no contact id for entity present
+    $contacts = array();
+    foreach($contact_ids as $contact_id) {
+      $contact = new CRM_Contact_BAO_Contact();
+      $contact->id = $contact_id;
+      if ($contact->find(TRUE)) {
+         $contacts[$contact_id] = $contact;
+      }
+    }
+    
+    return $contacts;
   }
   
 }
