@@ -64,6 +64,7 @@ class CRM_Triggers_BAO_TriggerAction extends CRM_Triggers_DAO_TriggerAction {
         . "AND `trigger_action_id` = '".$dao->escape($this->id)."')");
     
     if ($dao->find($fetchFirst)!==false) {
+      
       return $dao;
     }
     

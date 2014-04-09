@@ -57,6 +57,7 @@ class CRM_Triggers_BAO_TriggerRuleCondition extends CRM_Triggers_DAO_TriggerRule
     
     if ($is_aggregate) {
       $having = $this->aggregate_function ."(`".$sqlFieldName."`)";
+      $dao->selectAdd($having . " AS `".$sqlFieldName."`");
       $having .= " ".$this->operation." ";
       $having .= " '".$dao->escape($this->value)."'";
       $dao->having($having);
