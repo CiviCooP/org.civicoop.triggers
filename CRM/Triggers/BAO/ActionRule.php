@@ -15,6 +15,7 @@ class CRM_Triggers_BAO_ActionRule extends CRM_Triggers_DAO_ActionRule {
     
     //retrieve contacts from the entity
     $contacts = CRM_Triggers_Utils::getContactsFromEntity($objRef);
+
     $processCount = 0;
     if ($this->process_contacts && count($contacts)) {
       foreach($contacts as $contact) {

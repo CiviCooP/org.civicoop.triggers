@@ -47,11 +47,13 @@ class CRM_Triggers_Utils {
     
     $class = get_class($objRef);
     $fields = $class::fields();
+    $keyFields = $class::fieldKeys();
+    
     $contact_ids = array();
     if ($objRef instanceof CRM_Activity_DAO_Activity) {
       //retrieve the targets of this activity
       $contact_ids = CRM_Activity_BAO_ActivityTarget::retrieveTargetIdsByActivityId($objRef->id);
-    } elseif (isset($fields['contact_id'])) {
+    } elseif (isset($fields['contact_id']) || isset($keyFields['contact_id'])) {
       $contact_ids = array($objRef->contact_id);
     }
     
