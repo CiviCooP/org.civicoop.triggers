@@ -20,7 +20,7 @@ class CRM_Triggers_BAO_TriggerRule extends CRM_Triggers_DAO_TriggerRule {
     return new $dao();
   }
     /**
-     * Function to get conditions
+     * Function to get values
      * 
      * @author Erik Hommel (CiviCooP) <erik.hommel@civicoop.org>
      * @date 8 Apr 2014

@@ -24,4 +24,10 @@
     <title>TriggerRuleConditionDelete</title>
     <access_arguments>access CiviCRM</access_arguments>
   </item>
+  <item>
+    <path>civicrm/actionruleslist</path>
+    <page_callback>CRM_Triggers_Page_ActionRules</page_callback>
+    <title>ActionRules</title>
+    <access_arguments>access CiviCRM</access_arguments>
+  </item>
 </menu>

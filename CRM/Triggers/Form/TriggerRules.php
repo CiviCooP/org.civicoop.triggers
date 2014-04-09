@@ -31,7 +31,6 @@ class CRM_Triggers_Form_TriggerRules extends CRM_Core_Form {
         if ($this->_action == CRM_Core_Action::VIEW) {
             $this->add('text', 'label', ts('Label'), 
                 array(
-                    'maxlength' => 255,
                     'readonly'  => 'readonly',
                     'size' => CRM_Utils_Type::HUGE,
                 ), true);
@@ -224,7 +223,8 @@ class CRM_Triggers_Form_TriggerRules extends CRM_Core_Form {
     private function _listEntityFields() {
         if (isset($this->_entity) && !empty($this->_entity)) {
             $daoEntity = CRM_Triggers_BAO_TriggerRule::getEntityDAO($this->_entity);
-            $fields = $daoEntity->fields();
+            $className = get_class($daoEntity);
+            $fields = $className::fields();
             foreach ($fields as $field) {
                 $result[] = $field['name'];
             }
