@@ -70,6 +70,12 @@ class CRM_Triggers_DAO_ActionRule extends CRM_Core_DAO {
           'name' => 'params',
           'type' => CRM_Utils_Type::T_TEXT,
         ) ,
+        'process_contacts' => array(
+          'name' => 'process_contacts',
+          'type' => CRM_Utils_Type::T_BOOLEAN,
+          'required' => false,
+          'default' => '1',
+        ) ,
 
       );
     }
@@ -92,6 +98,7 @@ class CRM_Triggers_DAO_ActionRule extends CRM_Core_DAO {
         'entity' => 'entity',
         'action' => 'action',
         'params' => 'params',
+        'process_contacts' => 'process_contacts',
       );
     }
     return self::$_fieldKeys;
