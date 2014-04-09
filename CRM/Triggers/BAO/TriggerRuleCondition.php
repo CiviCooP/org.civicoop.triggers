@@ -95,7 +95,7 @@ class CRM_Triggers_BAO_TriggerRuleCondition extends CRM_Triggers_DAO_TriggerRule
     public static function add($params) {
         $result = array();
         if (empty($params)) {
-            CRM_Core_Error::fatal('Params can not be empty when adding or updating a TriggerRule Condition');
+            throw new Exception('Params can not be empty when adding or updating a TriggerRule Condition');
         }
         $triggerRuleCondition = new CRM_Triggers_BAO_TriggerRuleCondition();
         $fields = self::fields();
@@ -107,5 +107,24 @@ class CRM_Triggers_BAO_TriggerRuleCondition extends CRM_Triggers_DAO_TriggerRule
         $triggerRuleCondition->save();
         self::storeValues($triggerRuleCondition, $result);
         return $result;
+    }
+    /**
+     * Function to delete trigger rule condition
+     * 
+     * @author Erik Hommel (CiviCooP) <erik.hommel@civicoop.org>
+     * @date 9 Apr 2014
+     * @param int $triggerRuleConditionId 
+     * @return boolean
+     * @access public
+     * @static
+     */
+    public static function deleteById($triggerRuleConditionId) {
+        if (empty($triggerRuleConditionId)) {
+            throw new Exception('TriggerRuleConditionId can not be empty when attempting to delete one');
+        }
+        $condition = new CRM_Triggers_BAO_TriggerRuleCondition();
+        $condition->id = $triggerRuleConditionId;
+        $condition->delete();
+        return TRUE;
     }
 }

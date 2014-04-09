@@ -70,11 +70,11 @@ class CRM_Triggers_Form_TriggerRules extends CRM_Core_Form {
             $this->add('text', 'grouping_field');
         }
         $this->setDefaultValues();
-        $validActions = array('Create', 'Delete', 'Read', 'Update');
         /**
          * EH 8 Apr 2014: not required as long as we do cron processing only
          * @todo bring back when using post hook
          */
+        //$validActions = array('Create', 'Delete', 'Read', 'Update');
         //$this->add('select', 'operation', ts('Operation'), $validActions, true);
         
         $this->addButtons(array(
@@ -98,6 +98,15 @@ class CRM_Triggers_Form_TriggerRules extends CRM_Core_Form {
          */
         $session = CRM_Core_Session::singleton();
         $session->pushUserContext(CRM_Utils_System::url('civicrm/triggerruleslist'));
+        /*
+         * if action = delete, execute delete immediately
+         */
+        if ($this->_action == CRM_Core_Action::DELETE) {
+            $this->_id = CRM_Utils_Request::retrieve('tid', 'Integer', $this);
+            CRM_Triggers_BAO_TriggerRule::deleteById($this->_id);
+            $session->setStatus('Trigger deleted', 'Delete', 'success');
+            CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/triggerruleslist'));
+        }
         $this->_entities = array('Activity', 'Contribution', 'GroupContact');
 
         /*
@@ -108,6 +117,10 @@ class CRM_Triggers_Form_TriggerRules extends CRM_Core_Form {
             $this->_id = CRM_Utils_Request::retrieve('tid', 'Integer', $this);
             $conditionParams = array('trigger_rule_id' => $this->_id);
             $triggerConditions = CRM_Triggers_BAO_TriggerRuleCondition::getValues($conditionParams);
+            foreach ($triggerConditions as &$triggerCondition) {
+                $triggerCondition['delete'] = CRM_Utils_System::url('civicrm/conditiondelete', 
+                    'tid='.$this->_id.'&trcid='.$triggerCondition['id'], true);
+            }
             $this->assign('conditionRows', $triggerConditions);
             $conditionHeaders = array('Field Name', 'Operation', 'Value', 'Aggregate Function', 'Grouping Field');
             $this->assign('conditionHeaders', $conditionHeaders);
