@@ -37,7 +37,7 @@ class CRM_Triggers_BAO_ProcessedTrigger extends CRM_Triggers_DAO_ProcessedTrigge
     if (count($contactIds)) {
       $params['activity_type_id'] = self::getActivityTypeId();
       $params['source_record_id'] = $processed->id;
-      $params['subject'] = ts('Processed trigger "'.$trigger_rule->label.'"');
+      $params['subject'] = ts('Processed trigger "'.$trigger_rule->label.'" with action "'.$action_rule->label.'"');
       $params['status_id'] = 2; //completed
       //$params['target_contact_id'] = implode(",", $contactIds);
       $params['target_contact_id'] = $contactIds;
