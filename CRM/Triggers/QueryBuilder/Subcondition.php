@@ -24,12 +24,15 @@ class CRM_Triggers_QueryBuilder_Subcondition implements CRM_Triggers_QueryBuilde
   
   public function toSqlCondition() {
     $s = "";
-    foreach($this->subconditions as $c) {
-      if (strlen($s)) {
-        $s .= " ".$c->linkToPrevious;
+    if (count($this->subconditions) > 0) {
+      foreach($this->subconditions as $c) {
+        if (strlen($s)) {
+          $s .= " ".$c->linkToPrevious;
+        }
+        $s .= " ".$c->toSqlCondition();
       }
-      $s .= " ".$c->toSqlCondition();
     }
+    $s = trim($s);
   
     if (strlen($s)) {
       return "(".$s.")"; 

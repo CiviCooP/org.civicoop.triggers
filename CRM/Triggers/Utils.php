@@ -65,6 +65,7 @@ class CRM_Triggers_Utils {
     $customfields = CRM_Core_BAO_CustomField::getFields($entity, FALSE, FALSE, $subtype);
     foreach($customfields as $key => $field) {
       if ('custom_'.$key == $fieldName) {
+        $field['name'] = 'custom_'.$key; //add the name becuase that is not set
         return $field;
       }
     }

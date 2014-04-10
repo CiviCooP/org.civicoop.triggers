@@ -141,7 +141,8 @@ class CRM_Triggers_BAO_TriggerRuleCondition extends CRM_Triggers_DAO_TriggerRule
       
       $join = " LEFT JOIN `".$cgroup['table_name']."` AS `group_".$gid."` ON `".$table_name."`.`id` = `group_".$gid."`.`entity_id`";
       $builder->addJoin($join, "group_".$gid);
-      $fieldName = "`group_".$gid."`.`".$cfield['column_name']."`";      
+      $fieldName = "`group_".$gid."`.`".$cfield['column_name']."`";
+      $builder->addSelect("`group_".$gid."`.`".$cfield['column_name']."` AS `".$field['name']."`");
     }
     return $fieldName;
   }

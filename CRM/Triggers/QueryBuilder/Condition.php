@@ -14,6 +14,10 @@ class CRM_Triggers_QueryBuilder_Condition implements CRM_Triggers_QueryBuilder_C
    */
   public $linkToPrevious = 'AND';
   
+  public function __construct($cond) {
+    $this->condition = $cond;
+  }
+  
   public function getLinkToPrevious() {
     return $this->linkToPrevious;
   }

@@ -55,7 +55,7 @@ class CRM_Triggers_QueryBuilder {
     $where = $this->where->toSqlCondition();
     $having = $this->having->toSqlCondition();
     
-    $sql = "SELECT ".$select."FROM ".$this->from;
+    $sql = "SELECT ".$select." FROM ".$this->from;
     if (strlen($joins)) {
       $sql .= " ".$joins;
     }

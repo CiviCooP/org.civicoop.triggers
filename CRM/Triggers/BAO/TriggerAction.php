@@ -29,7 +29,7 @@ class CRM_Triggers_BAO_TriggerAction extends CRM_Triggers_DAO_TriggerAction {
   /**
    * Returns the found entities which should be processed by the trigger
    */
-  public function findEntities($fetchFirst=false) {
+  public function findEntities() {
     //check if this object is valid for finding entities
     if (empty($this->trigger_rule_id)) {
       throw new CRM_Triggers_Exception_InvalidTriggerAction("Trigger rule ID is not set");
@@ -44,14 +44,14 @@ class CRM_Triggers_BAO_TriggerAction extends CRM_Triggers_DAO_TriggerAction {
     $dao = CRM_Triggers_BAO_TriggerRule::getEntityDAO($trigger->entity);
     //build condition for this dao
     
-    $qb = new CRM_Triggers_QueryBuilder($dao->tableName());
+    $qb = new CRM_Triggers_QueryBuilder("`".$dao->tableName()."`");
     
     $where = new CRM_Triggers_QueryBuilder_Subcondition();
     $having = new CRM_Triggers_QueryBuilder_Subcondition();
     $conditions = CRM_Triggers_BAO_TriggerRuleCondition::findByTriggerRuleId($trigger->id);
     $conditionsCount = 0;
     while($conditions->fetch()) {
-      $conditions->parseCondition($where, $having, $qb);
+      $conditions->parseCondition($where, $having, $qb, $dao);
       $conditionsCount ++;
     }
     
@@ -59,25 +59,20 @@ class CRM_Triggers_BAO_TriggerAction extends CRM_Triggers_DAO_TriggerAction {
       throw new CRM_Triggers_Exception_NoConditions('No active conditions found for this rule, stop processing');
     }
     
+    //add a join on civicrm_processed_trigger
+    $alreadyProcessedCond = new CRM_Triggers_QueryBuilder_Condition("`".$dao->tableName() ."`.`id` NOT IN ("
+        . "SELECT `entity_id` FROM `civicrm_processed_trigger` "
+        . "WHERE `entity` = '".$dao->escape($trigger->entity)."' "
+        . "AND `trigger_action_id` = '".$dao->escape($this->id)."')");
+    
+    $where->addCond($alreadyProcessedCond);
+    
     //add the conditions to the query builder
     $qb->addWhere($where);
     $qb->addHaving($having);
     
-    //add a join on civicrm_processed_trigger
-    $alreadyProcessedCond = "`id` NOT IN ("
-        . "SELECT `entity_id` FROM `civicrm_processed_trigger` "
-        . "WHERE `entity` = '".$dao->escape($trigger->entity)."' "
-        . "AND `trigger_action_id` = '".$dao->escape($this->id)."')";
-    $qb->addWhere($alreadyProcessedCond);
-    
-    $entityDao = CRM_Core_DAO::executeQuery($qb->toSql());
-    
-    
-    if ($entityDao->find($fetchFirst)!==false) {
-      return $entityDao;
-    }
-    
-    throw new CRM_Triggers_Exception_QueryError("Query error on finding entities");
+    $entityDao = CRM_Core_DAO::executeQuery($qb->toSql());    
+    return $entityDao;
   }
     /**
      * Function to get conditions
