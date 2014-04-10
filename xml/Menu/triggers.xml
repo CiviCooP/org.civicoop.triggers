@@ -30,4 +30,16 @@
     <title>ActionRules</title>
     <access_arguments>access CiviCRM</access_arguments>
   </item>
+  <item>
+    <path>civicrm/triggeractionlist</path>
+    <page_callback>CRM_Triggers_Page_TriggerActions</page_callback>
+    <title>TriggerActions</title>
+    <access_arguments>access CiviCRM</access_arguments>
+  </item>
+  <item>
+    <path>civicrm/ruleschedulelist</path>
+    <page_callback>CRM_Triggers_Page_RuleSchedule</page_callback>
+    <title>RuleSchedule</title>
+    <access_arguments>access CiviCRM</access_arguments>
+  </item>
 </menu>
