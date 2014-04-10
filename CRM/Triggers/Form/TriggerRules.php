@@ -106,7 +106,7 @@ class CRM_Triggers_Form_TriggerRules extends CRM_Core_Form {
             $session->setStatus('Trigger deleted', 'Delete', 'success');
             CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/triggerruleslist'));
         }
-        $this->_entities = array('Activity', 'Contribution', 'GroupContact');
+        $this->_entities = array('Activity', 'Contribution', 'GroupContact', 'Contact');
 
         /*
          * if action is not add, store trigger_rule_id in $this->_id
