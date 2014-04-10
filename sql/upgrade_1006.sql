@@ -1,3 +1,5 @@
+ALTER TABLE  `civicrm_processed_trigger` CHANGE  `trigger_action_id`  `rule_schedule_id` INT( 11 ) NOT NULL ;
+
 DROP TABLE `civicrm_trigger_action`;
 
 -- --------------------------------------------------------

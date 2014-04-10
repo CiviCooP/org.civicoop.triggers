@@ -73,6 +73,19 @@ class CRM_Triggers_Upgrader extends CRM_Triggers_Upgrader_Base {
     $this->executeSqlFile('sql/upgrade_1005.sql');
     return TRUE;
   }
+  
+  /**
+   * Upgrade 1006
+   *
+   * @return TRUE on success
+   * @throws Exception
+   */ 
+  public function upgrade_1006() {
+    $this->ctx->log->info('Applying update 1006');
+    // this path is relative to the extension base dir
+    $this->executeSqlFile('sql/upgrade_1006.sql');
+    return TRUE;
+  }
 
   /**
    * Example: Run a simple query when a module is enabled
