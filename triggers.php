@@ -143,7 +143,7 @@ function triggers_civicrm_navigationMenu( &$params ) {
     
     $addAction = array(
         'name'          =>  ts('Add Action'),
-        'url'           =>  CRM_Utils_System::url('civicrm/actionrules', 'action=add&reset=1', true),
+        'url'           =>  CRM_Utils_System::url('civicrm/actionrule', 'action=add&reset=1', true),
         'permission'    =>  'administer CiviCRM'
     );
     _triggers_civix_insert_navigation_menu($params, 'Administer/Trigger Action Rules', $addAction);

@@ -15,7 +15,7 @@ require_once 'CRM/Core/Page.php';
 class CRM_Triggers_Page_ActionRules extends CRM_Core_Page {
     function run() {
         CRM_Utils_System::setTitle(ts('List of Action Rules'));
-        $this->assign('addUrl', CRM_Utils_System::url('civicrm/actionrules', 'action=add&reset=1', true));
+        $this->assign('addUrl', CRM_Utils_System::url('civicrm/actionrule', 'action=add&reset=1', true));
         $rowHeaders = array('Label', 'Entity', 'Action', 'Parameters');
         $this->assign('rowHeaders', $rowHeaders);
         
@@ -29,9 +29,9 @@ class CRM_Triggers_Page_ActionRules extends CRM_Core_Page {
             $row['action'] = $dataRow['action'];
             $row['params'] = $dataRow['params'];
             $rowActions = array();
-            $viewUrl = CRM_Utils_System::url('civicrm/actionrules', 'action=view&reset=1&aid='.$dataRow['id'], true);
-            $editUrl = CRM_Utils_System::url('civicrm/actionrules', 'action=update&reset=1&aid='.$dataRow['id'], true);
-            $deleteUrl = CRM_Utils_System::url('civicrm/actionrules', 'action=delete&reset=1&aid='.$dataRow['id'], true);
+            $viewUrl = CRM_Utils_System::url('civicrm/actionrule', 'action=view&reset=1&aid='.$dataRow['id'], true);
+            $editUrl = CRM_Utils_System::url('civicrm/actionrule', 'action=update&reset=1&aid='.$dataRow['id'], true);
+            $deleteUrl = CRM_Utils_System::url('civicrm/actionrule', 'action=delete&reset=1&aid='.$dataRow['id'], true);
             $rowActions[] = '<a class="action-item" title="View action details" href="'.$viewUrl.'">View</a>';
             $rowActions[] = '<a class="action-item" title="Edit action" href="'.$editUrl. '">Edit</a>';
             $rowActions[] = '<a class="action-item" title="Delete action" href="'.$deleteUrl.'">Delete</a>';
