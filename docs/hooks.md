@@ -2,18 +2,21 @@
 
 ## civicrm_trigger_condition_parse
 
-This hook is invoked on the moment the condition is parsed to a sql condition on a dao.
+This hook is invoked on the moment the condition is parsed to a sql condition on the query builder
 
 ### Parameters
 
-1. *CRM_Triggers_BAO_TriggerRuleCondition* $condition
-2. *CRM_Core_DAO* $dao 
+1. `CRM_Triggers_BAO_TriggerRuleCondition $condition`
+2. `CRM_Triggers_QueryBuilder $builder`
+3. `CRM_Triggers_QueryBuilder_Subcondition $where`
+4. `CRM_Triggers_QueryBuilder_Subcondition $having`
+5. `CRM_Core_DAO $entityDAO` 
 
 ### Example
 
 Below an example of usage of hook which will set the is_active condition on the dao when the field_name is contact_id. This example is probably useless :-)
 
-    function hook_civicrm_trigger_condition_parse(CRM_Triggers_BAO_TriggerRuleCondition $condition, CRM_Core_DAO $dao) {
+    function hook_civicrm_trigger_condition_parse(CRM_Triggers_BAO_TriggerRuleCondition $condition, CRM_Triggers_QueryBuilder $builder CRM_Triggers_QueryBuilder_Subcondition $where, CRM_Triggers_QueryBuilder_Subcondition $having, CRM_Core_DAO $entityDAO) {
         if ($condition->field_name == 'contact_id') {
             $dao->addWhere("is_active = '1'"); //only active contacts
         }

@@ -17,7 +17,7 @@ class CRM_Triggers_BAO_TriggerRule extends CRM_Triggers_DAO_TriggerRule {
     if ($dao == NULL) {
       throw new CRM_Triggers_Exception_DAO_Not_Found("Entity ".$entity." has no DAO");
     }
-    return new $dao();
+    return $dao;
   }
     /**
      * Function to get values

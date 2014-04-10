@@ -17,9 +17,9 @@ class CRM_Triggers_BAO_TriggerAction extends CRM_Triggers_DAO_TriggerAction {
     $trigger_action->selectAdd();
     $trigger_action->selectAdd("*");
     $trigger_action->whereAdd('is_active = 1');
-    $trigger_action->whereAdd('(start_date IS NULL OR start_date <= CURDATE())');
-    $trigger_action->whereAdd('(end_date IS NULL OR end_date >= CURDATE())');
-    $trigger_action->whereAdd('(next_run <= CURDATE())');
+    $trigger_action->whereAdd('(start_date IS NULL OR start_date <= NOW())');
+    $trigger_action->whereAdd('(end_date IS NULL OR end_date >= NOW())');
+    $trigger_action->whereAdd('(next_run <= NOW())');
     
     $trigger_action->find($fetchFirst);
     
@@ -29,7 +29,7 @@ class CRM_Triggers_BAO_TriggerAction extends CRM_Triggers_DAO_TriggerAction {
   /**
    * Returns the found entities which should be processed by the trigger
    */
-  public function findEntities($fetchFirst=false) {
+  public function findEntities() {
     //check if this object is valid for finding entities
     if (empty($this->trigger_rule_id)) {
       throw new CRM_Triggers_Exception_InvalidTriggerAction("Trigger rule ID is not set");
@@ -40,16 +40,19 @@ class CRM_Triggers_BAO_TriggerAction extends CRM_Triggers_DAO_TriggerAction {
     $trigger->selectAdd('*');
     $trigger->whereAdd("id = '".$this->trigger_rule_id."'");
     $trigger->find(TRUE);
-    
-    $dao = CRM_Triggers_BAO_TriggerRule::getEntityDAO($trigger->entity);
+           
+    $daoClass = CRM_Triggers_BAO_TriggerRule::getEntityDAO($trigger->entity);
+    $dao = new $daoClass();
     //build condition for this dao
-    $dao->selectAdd();
-    $dao->selectAdd('*');
     
+    $qb = new CRM_Triggers_QueryBuilder("`".$dao->tableName()."`");
+    
+    $where = new CRM_Triggers_QueryBuilder_Subcondition();
+    $having = new CRM_Triggers_QueryBuilder_Subcondition();
     $conditions = CRM_Triggers_BAO_TriggerRuleCondition::findByTriggerRuleId($trigger->id);
     $conditionsCount = 0;
     while($conditions->fetch()) {
-      $conditions->parseCondition($dao);
+      $conditions->parseCondition($where, $having, $qb, $dao);
       $conditionsCount ++;
     }
     
@@ -58,17 +61,19 @@ class CRM_Triggers_BAO_TriggerAction extends CRM_Triggers_DAO_TriggerAction {
     }
     
     //add a join on civicrm_processed_trigger
-    $dao->whereAdd("`id` NOT IN ("
+    $alreadyProcessedCond = new CRM_Triggers_QueryBuilder_Condition("`".$dao->tableName() ."`.`id` NOT IN ("
         . "SELECT `entity_id` FROM `civicrm_processed_trigger` "
         . "WHERE `entity` = '".$dao->escape($trigger->entity)."' "
         . "AND `trigger_action_id` = '".$dao->escape($this->id)."')");
     
-    if ($dao->find($fetchFirst)!==false) {
-      
-      return $dao;
-    }
+    $where->addCond($alreadyProcessedCond);
     
-    throw new CRM_Triggers_Exception_QueryError("Query error on finding entities");
+    //add the conditions to the query builder
+    $qb->addWhere($where);
+    $qb->addHaving($having);
+    
+    $entityDao = CRM_Core_DAO::executeQuery($qb->toSql(), array(), TRUE, $daoClass);    
+    return $entityDao;
   }
     /**
      * Function to get conditions
