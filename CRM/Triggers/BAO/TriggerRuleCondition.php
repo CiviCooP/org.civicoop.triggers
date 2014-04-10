@@ -102,7 +102,8 @@ class CRM_Triggers_BAO_TriggerRuleCondition extends CRM_Triggers_DAO_TriggerRule
       $strCond .= " '".$entityDAO->escape($this->value)."'";
       
       $cond = new CRM_Triggers_QueryBuilder_Condition($strCond);
-      $where->addCond($cond);      
+      $where->addCond($cond);  
+      $qb->addSelect($sqlFieldName);
     }
     
     $hooks = CRM_Utils_Hook::singleton();

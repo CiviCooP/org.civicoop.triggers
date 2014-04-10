@@ -4,7 +4,7 @@
  * This is the BAO file for the trigger action table
  */
 
-class CRM_Triggers_BAO_TriggerAction extends CRM_Triggers_DAO_TriggerAction {
+class CRM_Triggers_BAO_RuleSchedule extends CRM_Triggers_DAO_RuleSchedule {
 
   /**
    * Find trigger actions which are ready for processing

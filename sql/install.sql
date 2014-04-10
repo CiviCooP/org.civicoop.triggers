@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS `civicrm_action_rule` (
   `params` text,
   `process_contacts` TINYINT UNSIGNED NOT NULL DEFAULT  '1'
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -28,17 +28,18 @@ CREATE TABLE IF NOT EXISTS `civicrm_trigger_rule` (
   `entity` varchar(255) NOT NULL,
   `operation` varchar(255),
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `civicrm_trigger_action`
+-- Table structure for table `civicrm_rule_schedule`
 --
 
-CREATE TABLE IF NOT EXISTS `civicrm_trigger_action` (
+CREATE TABLE IF NOT EXISTS `civicrm_rule_schedule` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `trigger_rule_id` int(11) NOT NULL,
+  `label` varchar(255) NOT NULL,
+  `name` varchar(255) NOT NULL,
   `action_rule_id` int(11) NOT NULL,
   `schedule` varchar(255) NOT NULL,
   `last_run` datetime DEFAULT NULL,
@@ -47,7 +48,15 @@ CREATE TABLE IF NOT EXISTS `civicrm_trigger_action` (
   `start_date` datetime DEFAULT NULL,
   `end_date` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB AUTO_INCREMENT=1;
+
+CREATE TABLE IF NOT EXISTS `civicrm_rule_schedule_trigger` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `rule_schedule_id` int(10) unsigned NOT NULL,
+  `trigger_rule_id` int(10) unsigned NOT NULL,
+  `logic_operator` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -64,7 +73,7 @@ CREATE TABLE IF NOT EXISTS `civicrm_trigger_rule_condition` (
   `aggregate_function` varchar(255) DEFAULT NULL,
   `grouping_field` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB AUTO_INCREMENT=1 ;
 
 CREATE TABLE IF NOT EXISTS `civicrm_processed_trigger` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
@@ -74,4 +83,4 @@ CREATE TABLE IF NOT EXISTS `civicrm_processed_trigger` (
   `date_processed` datetime NOT NULL,
   PRIMARY KEY (`id`),
   KEY `trigger_action` (`trigger_action_id`,`entity`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB AUTO_INCREMENT=1 ;
