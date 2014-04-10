@@ -51,7 +51,7 @@ function civicrm_api3_trigger_action_process($params) {
       
       $rule_schedule->reschedule();
       $count ++;
-      $messages[] = 'Trigger "'.$rule_schedule->label.'" processed resulting '.$processedEntityCount.' executed action(s)';
+      $messages[] = 'Trigger "'.$rule_schedule->label.'" processed resulting in '.$processedEntityCount.' executed action(s)';
     } catch (Exception $e) {
       $messages[] = "Trigger '".$rule_schedule->label."' had an error during processing";
     }    
