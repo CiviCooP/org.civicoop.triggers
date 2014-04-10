@@ -22,10 +22,16 @@ function _civicrm_api3_trigger_action_process_spec(&$spec) {
  * @throws API_Exception
  */
 function civicrm_api3_trigger_action_process($params) {
-  $actions = CRM_Triggers_BAO_TriggerAction::findForProcessing(FALSE);
+  $limit = 1; //limit of rule schedules to execute in one go
+  if (isset($params['limit'])) {
+    $limit = $params['limit'];
+  }
+  
+  $rule_schedule = CRM_Triggers_BAO_RuleSchedule::findForProcessing(FALSE);
   $messages = array();
   $count = 0;
-  while ($actions->fetch()) {
+  
+  while ($rule_schedule->fetch()) {
     //process this trigger action
     //here comes all the logic etc....
     
@@ -39,28 +45,16 @@ function civicrm_api3_trigger_action_process($params) {
     
     
     //Retrieve the entities
-    $entities = $actions->findEntities();
-    
-    $trigger = new CRM_Triggers_BAO_TriggerRule();
-    $trigger->id = $actions->trigger_rule_id;
-    $trigger->find(TRUE);
-    
-    $action = CRM_Triggers_BAO_ActionRule::findByActionId($actions->action_rule_id);
-    $processedEntityCount = 0;
-    while ($entities->fetch()) {
-      //process the entity
-      $processCount = $action->processEntity($entities, $trigger, $actions);
+    try {
+      $processedEntityCount = $rule_schedule->process();
+      //reschedule the trigger-action
       
-      if ($processCount) {
-        $processedEntityCount = $processedEntityCount + $processCount;
-      }
-    }
-    
-    //reschedule the trigger-action
-    $actions->reschedule();
-    
-    $count ++;
-    $messages[] = 'Trigger "'.$trigger->label.'" processed '.$processedEntityCount.' entities';
+      $rule_schedule->reschedule();
+      $count ++;
+      $messages[] = 'Trigger "'.$rule_schedule->label.'" processed resulting in '.$processedEntityCount.' executed action(s)';
+    } catch (Exception $e) {
+      $messages[] = "Trigger '".$rule_schedule->label."' had an error during processing";
+    }    
   }
   
   $params['message'] = 'Processed '.$count.' triggers. '.implode(' ', $messages);

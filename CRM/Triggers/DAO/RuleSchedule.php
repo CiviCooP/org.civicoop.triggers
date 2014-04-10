@@ -6,7 +6,7 @@
  * This is used to retrieve trigger and actions upon processing
  */
 
-class CRM_Triggers_DAO_TriggerAction extends CRM_Core_DAO {
+class CRM_Triggers_DAO_RuleSchedule extends CRM_Core_DAO {
   
   /**
    * static instance to hold the field values
@@ -20,7 +20,7 @@ class CRM_Triggers_DAO_TriggerAction extends CRM_Core_DAO {
    * empty definition for virtual function
    */
   static function getTableName() {
-    return 'civicrm_trigger_action';
+    return 'civicrm_rule_schedule';
   }
   
   /**
@@ -35,11 +35,6 @@ class CRM_Triggers_DAO_TriggerAction extends CRM_Core_DAO {
       self::$_fields = array(
         'id' => array(
           'name' => 'id',
-          'type' => CRM_Utils_Type::T_INT,
-          'required' => true,
-        ) ,
-        'trigger_rule_id' => array(
-          'name' => 'trigger_rule_id',
           'type' => CRM_Utils_Type::T_INT,
           'required' => true,
         ) ,
@@ -93,7 +88,6 @@ class CRM_Triggers_DAO_TriggerAction extends CRM_Core_DAO {
     if (!(self::$_fieldKeys)) {
       self::$_fieldKeys = array(
         'id' => 'id',
-        'trigger_rule_id' => 'trigger_rule_id',
         'action_rule_id' => 'action_rule_id',
         'schedule' => 'schedule',
         'last_run' => 'last_run',

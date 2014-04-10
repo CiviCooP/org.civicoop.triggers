@@ -10,15 +10,16 @@ This hook is invoked on the moment the condition is parsed to a sql condition on
 2. `CRM_Triggers_QueryBuilder $builder`
 3. `CRM_Triggers_QueryBuilder_Subcondition $where`
 4. `CRM_Triggers_QueryBuilder_Subcondition $having`
-5. `CRM_Core_DAO $entityDAO` 
+5. `CRM_Triggers_BAO_TriggerRule $trigger_rule`
 
 ### Example
 
 Below an example of usage of hook which will set the is_active condition on the dao when the field_name is contact_id. This example is probably useless :-)
 
-    function hook_civicrm_trigger_condition_parse(CRM_Triggers_BAO_TriggerRuleCondition $condition, CRM_Triggers_QueryBuilder $builder CRM_Triggers_QueryBuilder_Subcondition $where, CRM_Triggers_QueryBuilder_Subcondition $having, CRM_Core_DAO $entityDAO) {
+    function hook_civicrm_trigger_condition_parse(CRM_Triggers_BAO_TriggerRuleCondition $condition, CRM_Triggers_QueryBuilder $builder CRM_Triggers_QueryBuilder_Subcondition $where, CRM_Triggers_QueryBuilder_Subcondition $having, CRM_Triggers_BAO_TriggerRule $trigger_rule) {
         if ($condition->field_name == 'contact_id') {
-            $dao->addWhere("is_active = '1'"); //only active contacts
+            $cond = new CRM_Triggers_QueryBuilder_Condition("is_active = 1");
+            $where->addCondition($cond); //only active contacts
         }
     }
 
@@ -37,12 +38,12 @@ You can set parameters in the variable `$return`.
 1. `$return` This is an array you can set which is used the execution of the action
 2. `$params` this is an array with the source parameters
 3. `array $objects` this is the entity which is processed
-4. `CRM_Triggers_BAO_TriggerRule $trigger_rule` this is actual trigger
+4. `CRM_Triggers_BAO_RuleSchedule $rule_schedule` this is actual trigger
 5. `CRM_Triggers_BAO_ActionRule $action` this is the actual action
 
 ### Example
 
-    function hook_civicrm_trigger_action_parse_params(&$return, $params, $objects, CRM_Triggers_BAO_TriggerRule $trigger_rule, CRM_Triggers_BAO_ActionRule $action) {
+    function hook_civicrm_trigger_action_parse_params(&$return, $params, $objects, CRM_Triggers_BAO_RuleSchedule $rule_schedule, CRM_Triggers_BAO_ActionRule $action) {
         if ($action->name == 'GroupMovement' and $action->entity == 'GroupContact') {
             $return['group_id'] = 21;//use group 21 for the action
         }
