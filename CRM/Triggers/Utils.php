@@ -73,6 +73,14 @@ class CRM_Triggers_Utils {
     return false;
   }
   
+  public static function getContactsFromEntities($entities) {
+    $contacts = array();
+    foreach($entities as $entity) {
+      $contacts = array_merge($contacts, self::getContactsFromEntity($entity));
+    }
+    return $contacts;
+  }
+  
   /**
    * Returns the contacts belonging to an entity
    * 

@@ -38,12 +38,12 @@ You can set parameters in the variable `$return`.
 1. `$return` This is an array you can set which is used the execution of the action
 2. `$params` this is an array with the source parameters
 3. `array $objects` this is the entity which is processed
-4. `CRM_Triggers_BAO_TriggerRule $trigger_rule` this is actual trigger
+4. `CRM_Triggers_BAO_RuleSchedule $rule_schedule` this is actual trigger
 5. `CRM_Triggers_BAO_ActionRule $action` this is the actual action
 
 ### Example
 
-    function hook_civicrm_trigger_action_parse_params(&$return, $params, $objects, CRM_Triggers_BAO_TriggerRule $trigger_rule, CRM_Triggers_BAO_ActionRule $action) {
+    function hook_civicrm_trigger_action_parse_params(&$return, $params, $objects, CRM_Triggers_BAO_RuleSchedule $rule_schedule, CRM_Triggers_BAO_ActionRule $action) {
         if ($action->name == 'GroupMovement' and $action->entity == 'GroupContact') {
             $return['group_id'] = 21;//use group 21 for the action
         }

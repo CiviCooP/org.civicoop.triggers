@@ -23,8 +23,19 @@ class CRM_Triggers_BAO_RuleScheduleTrigger extends CRM_Triggers_DAO_RuleSchedule
     $trigger = $this->getTriggerRule();
     $daoClass = $trigger->getEntityDAOClass();
     $builder = new CRM_Triggers_QueryBuilder("`" . $daoClass::getTableName() . "`");
-    $builder->addSelect("`" . $daoClass::getTableName() . "`.*");
     return $builder;
+  }
+  
+  public function addSelectToQueryBuilder(CRM_Triggers_QueryBuilder $builder) {
+    $trigger = $this->getTriggerRule();
+    $daoClass = $trigger->getEntityDAOClass();
+    $fields = $daoClass::fields();
+    $table = $daoClass::getTableName();
+    foreach($fields as $field) {
+      if (isset($field['name'])) {
+        $builder->addSelect("`".$table."`.`".$field['name']."` AS `".$table."_".$field['name']."`");
+      }
+    }
   }
   
   /**
