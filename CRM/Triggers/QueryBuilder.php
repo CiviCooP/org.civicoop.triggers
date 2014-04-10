@@ -2,7 +2,7 @@
 
 class CRM_Triggers_QueryBuilder {
   
-  protected $select = array('*');
+  protected $select = array();
   
   protected $from;
   

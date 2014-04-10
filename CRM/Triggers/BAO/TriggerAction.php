@@ -46,6 +46,7 @@ class CRM_Triggers_BAO_TriggerAction extends CRM_Triggers_DAO_TriggerAction {
     //build condition for this dao
     
     $qb = new CRM_Triggers_QueryBuilder("`".$dao->tableName()."`");
+    $qb->addSelect("`".$dao->tableName()."`.*");
     
     $where = new CRM_Triggers_QueryBuilder_Subcondition();
     $having = new CRM_Triggers_QueryBuilder_Subcondition();
