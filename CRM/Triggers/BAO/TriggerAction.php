@@ -17,9 +17,9 @@ class CRM_Triggers_BAO_TriggerAction extends CRM_Triggers_DAO_TriggerAction {
     $trigger_action->selectAdd();
     $trigger_action->selectAdd("*");
     $trigger_action->whereAdd('is_active = 1');
-    $trigger_action->whereAdd('(start_date IS NULL OR start_date <= CURDATE())');
-    $trigger_action->whereAdd('(end_date IS NULL OR end_date >= CURDATE())');
-    $trigger_action->whereAdd('(next_run <= CURDATE())');
+    $trigger_action->whereAdd('(start_date IS NULL OR start_date <= NOW())');
+    $trigger_action->whereAdd('(end_date IS NULL OR end_date >= NOW())');
+    $trigger_action->whereAdd('(next_run <= NOW())');
     
     $trigger_action->find($fetchFirst);
     
@@ -63,7 +63,7 @@ class CRM_Triggers_BAO_TriggerAction extends CRM_Triggers_DAO_TriggerAction {
         . "WHERE `entity` = '".$dao->escape($trigger->entity)."' "
         . "AND `trigger_action_id` = '".$dao->escape($this->id)."')");
     
-    if ($dao->find($fetchFirst)!==false) {
+    if ($dao->find($fetchFirst, true)!==false) {
       
       return $dao;
     }

@@ -5,7 +5,20 @@
  */
 
 class CRM_Triggers_BAO_TriggerRuleCondition extends CRM_Triggers_DAO_TriggerRuleCondition {
-    /**
+  
+  /**
+   *
+   * @var array of custom groups instances
+   */
+  private static $custom_groups = array();
+  
+  /**
+   *
+   * @var array of custom field instances 
+   */
+  private static $custom_fields = array();
+  
+  /**
      * Function to get conditions
      * 
      * @author Erik Hommel (CiviCooP) <erik.hommel@civicoop.org>
@@ -44,10 +57,17 @@ class CRM_Triggers_BAO_TriggerRuleCondition extends CRM_Triggers_DAO_TriggerRule
     //check if field exist in DAO
     $daoClass = get_class($dao);
     $fields = $daoClass::fields();
-    if (!isset($fields[$this->field_name]) || !isset($fields[$this->field_name]['name'])) {
+    $fieldKeys = $daoClass::fieldKeys();
+    
+    $sqlFieldName = false;
+    $field = CRM_Triggers_Utils::getFieldFromDao($dao, $this->field_name);
+    if ($field !== false) {
+      $sqlFieldName = $this->parseField($field, $dao);
+    }
+    
+    if ($sqlFieldName === false) {
       throw new CRM_Triggers_Exception_InvalidCondition("Invalid field '".$this->field_name."'");
     }
-    $sqlFieldName = $fields[$this->field_name]['name'];
 
     //determine if this condition is an aggregation
     $is_aggregate = false;
@@ -56,20 +76,26 @@ class CRM_Triggers_BAO_TriggerRuleCondition extends CRM_Triggers_DAO_TriggerRule
     }
     
     if ($is_aggregate) {
-      $having = $this->aggregate_function ."(`".$sqlFieldName."`)";
+      $having = $this->aggregate_function ."(".$sqlFieldName.")";
       $dao->selectAdd($having . " AS `".$sqlFieldName."`");
       $having .= " ".$this->operation." ";
       $having .= " '".$dao->escape($this->value)."'";
       $dao->having($having);
       
-      if (!isset($fields[$this->grouping_field]) || !isset($fields[$this->grouping_field]['name'])) {
+      
+      $sqlGroupingFieldName = false;
+      $groupField = CRM_Triggers_Utils::getFieldFromDao($dao, $this->field_name);    
+      if ($groupField !== false) {
+        $sqlGroupingFieldName = $this->parseField($groupField, $dao);
+      }
+      
+      if ($sqlGroupingFieldName === false) {
         throw new CRM_Triggers_Exception_InvalidCondition("Invalid field '".$this->grouping_field."'");
       }
-      $sqlGroupingFieldName = $fields[$this->grouping_field]['name'];
       $dao->groupBy($sqlGroupingFieldName);
       
     } else {
-      $clause = "`".$sqlFieldName."`";
+      $clause = "".$sqlFieldName."";
       $clause .= " ".$this->operation." ";
       $clause .= " '".$dao->escape($this->value)."'";
       $dao->whereAdd($clause);
@@ -81,6 +107,38 @@ class CRM_Triggers_BAO_TriggerRuleCondition extends CRM_Triggers_DAO_TriggerRule
       'civicrm_trigger_condition_parse'
       );
     
+  }
+  
+  /**
+   * returns the alias field to use in the query and optionally add joins for custom field/tables
+   * 
+   * @param type $field
+   * @param CRM_Core_DAO $dao
+   * @return type
+   */
+  private function parseField($field, CRM_Core_DAO $dao) {
+    $daoClass = get_class($dao);
+    $fieldName = "`".$daoClass::getTableName()."`.`".$field['name']."`";
+    
+    //if the field is a custom field add the column and table as a join
+    if (isset($field['custom_group_id'])) {
+      $gid = $field['custom_group_id'];
+      
+      if (!isset(self::$custom_groups[$gid])) {
+        self::$custom_groups[$gid] = civicrm_api3('CustomGroup', 'getsingle', array('id' => $gid));
+      }
+      if (!isset(self::$custom_fields[$gid])) {
+        $fields = civicrm_api3('CustomField', 'get', array('custom_group_id' => $gid));
+        foreach($fields['values'] as $f) {
+          self::$custom_fields[$gid]['custom_'.$f['id']] = $f;
+        }
+      }
+      $cgroup = self::$custom_groups[$gid];      
+      $cfield = self::$custom_fields[$gid][$field['name']];
+      $dao->joinAdd($cgroup['table_name'], 'LEFT', 'group_'.$gid, "`".$daoClass::getTableName()."`.`id` = `group_".$gid."`.`entity_id`");
+      $fieldName = "`group_".$gid."`.`".$cfield['column_name']."`";
+    }
+    return $fieldName;
   }
   
   public static function findByTriggerRuleId($trigger_rule_id, $fetchFirst=FALSE) {
