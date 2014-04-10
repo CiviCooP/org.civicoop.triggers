@@ -56,7 +56,9 @@ class CRM_Triggers_BAO_TriggerRuleCondition extends CRM_Triggers_DAO_TriggerRule
    * @param CRM_Triggers_QueryBuilder $builder
    * @throws CRM_Triggers_Exception_InvalidCondition
    */
-  public function parseCondition(CRM_Triggers_QueryBuilder_Subcondition $where, CRM_Triggers_QueryBuilder_Subcondition $having, CRM_Triggers_QueryBuilder $builder, CRM_Core_DAO $entityDAO) {
+  public function parseCondition(CRM_Triggers_QueryBuilder_Subcondition $where, CRM_Triggers_QueryBuilder_Subcondition $having, CRM_Triggers_QueryBuilder $builder) {
+    $trigger = CRM_Triggers_BAO_TriggerRule::getDaoByTriggerRuleId($this->trigger_rule_id);
+    $entityDAO = $trigger->getEntityDAO();
     
     //check if field exist in DAO    
     $sqlFieldName = false;
@@ -80,7 +82,7 @@ class CRM_Triggers_BAO_TriggerRuleCondition extends CRM_Triggers_DAO_TriggerRule
       $builder->addSelect($strCond . " AS `".$sqlFieldName."`");
       
       $strCond .= " ".$this->operation." ";
-      $strCond .= " '".$entityDAO->escape($this->value)."'";
+      $strCond .= " ".$this->value."";
       
       $cond = new CRM_Triggers_QueryBuilder_Condition($strCond);
       $having->addCond($cond);
@@ -99,16 +101,16 @@ class CRM_Triggers_BAO_TriggerRuleCondition extends CRM_Triggers_DAO_TriggerRule
     } else {
       $strCond = "".$sqlFieldName."";
       $strCond .= " ".$this->operation." ";
-      $strCond .= " '".$entityDAO->escape($this->value)."'";
+      $strCond .= " ".$this->value."";
       
       $cond = new CRM_Triggers_QueryBuilder_Condition($strCond);
       $where->addCond($cond);  
-      $qb->addSelect($sqlFieldName);
+      $builder->addSelect($sqlFieldName);
     }
     
     $hooks = CRM_Utils_Hook::singleton();
     $hooks->invoke(2,
-      $this, $builder, $where, $having, $entityDAO,
+      $this, $builder, $where, $having, $trigger,
       'civicrm_trigger_condition_parse'
       );
     
