@@ -17,15 +17,15 @@ class CRM_Triggers_BAO_ProcessedTrigger extends CRM_Triggers_DAO_ProcessedTrigge
    * 
    * @param CRM_Core_DAO $entity
    * @param CRM_Triggers_BAO_TriggerRule $trigger_rule
-   * @param CRM_Triggers_BAO_TriggerAction $triger_action
+   * @param CRM_Triggers_BAO_RuleSchedule $rule_schedule
    * @param type $contacts
    */
-  public static function processTrigger(CRM_Core_DAO $entity, CRM_Triggers_BAO_TriggerRule $trigger_rule, CRM_Triggers_BAO_TriggerAction $triger_action, CRM_Triggers_BAO_ActionRule $action_rule, $contacts) {
+  public static function processTrigger(CRM_Core_DAO $entity, CRM_Triggers_BAO_TriggerRule $trigger_rule, CRM_Triggers_BAO_RuleSchedule $rule_schedule, CRM_Triggers_BAO_ActionRule $action_rule, $contacts) {
     $processed = new CRM_Triggers_DAO_ProcessedTrigger();
     $processed->date_processed = date('YmdHis');
     $processed->entity = $trigger_rule->entity;
     $processed->entity_id = $entity->id;
-    $processed->trigger_action_id = $triger_action->id;
+    $processed->trigger_action_id = $rule_schedule->id;
     $processed->save();
     
     $contactIds = array();

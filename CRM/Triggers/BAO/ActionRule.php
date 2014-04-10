@@ -9,7 +9,7 @@ class CRM_Triggers_BAO_ActionRule extends CRM_Triggers_DAO_ActionRule {
    * Process the action for the given entity ($objRef)
    * @param CRM_Core_DAO $objRef
    */
-  public function processEntity(CRM_Core_DAO $objRef, CRM_Triggers_BAO_TriggerRule $trigger_rule, CRM_Triggers_BAO_TriggerAction $trigger_action) {
+  public function processEntity(CRM_Core_DAO $objRef, CRM_Triggers_BAO_TriggerRule $trigger_rule, CRM_Triggers_BAO_RuleSchedule $rule_schedule) {
     //set the objects array for processing
     $objects[strtolower($trigger_rule->entity)] = $objRef;
     
@@ -32,7 +32,7 @@ class CRM_Triggers_BAO_ActionRule extends CRM_Triggers_DAO_ActionRule {
     
     //add an activity type and add this entity to the processed table        
       //we do that through the processed trigger BAO
-    CRM_Triggers_BAO_ProcessedTrigger::processTrigger($objRef, $trigger_rule, $trigger_action, $this, $contacts);
+    CRM_Triggers_BAO_ProcessedTrigger::processTrigger($objRef, $trigger_rule, $rule_schedule, $this, $contacts);
     
     return $processCount;
   }

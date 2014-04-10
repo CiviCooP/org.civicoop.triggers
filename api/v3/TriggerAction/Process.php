@@ -22,7 +22,7 @@ function _civicrm_api3_trigger_action_process_spec(&$spec) {
  * @throws API_Exception
  */
 function civicrm_api3_trigger_action_process($params) {
-  $actions = CRM_Triggers_BAO_TriggerAction::findForProcessing(FALSE);
+  $actions = CRM_Triggers_BAO_RuleSchedule::findForProcessing(FALSE);
   $messages = array();
   $count = 0;
   while ($actions->fetch()) {

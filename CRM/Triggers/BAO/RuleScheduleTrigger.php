@@ -21,9 +21,9 @@ class CRM_Triggers_BAO_RuleScheduleTrigger extends CRM_Triggers_DAO_RuleSchedule
    */
   public function createQueryBuilder() {
     $trigger = $this->getTriggerRule();
-    $dao = $trigger->getEntityDAO();
-    $builder = new CRM_Triggers_QueryBuilder("`" . $dao->tableName() . "`");
-    $builder->addSelect("`" . $dao->tableName() . "`.*");
+    $daoClass = $trigger->getEntityDAOClass();
+    $builder = new CRM_Triggers_QueryBuilder("`" . $daoClass::getTableName() . "`");
+    $builder->addSelect("`" . $daoClass::getTableName() . "`.*");
     return $builder;
   }
   
@@ -36,6 +36,7 @@ class CRM_Triggers_BAO_RuleScheduleTrigger extends CRM_Triggers_DAO_RuleSchedule
     //build condition for this dao
     $trigger = $this->getTriggerRule();
     $dao = $trigger->getEntityDAO();
+    $daoClass = $trigger->getEntityDAOClass();
     $where = new CRM_Triggers_QueryBuilder_Subcondition();
     $having = new CRM_Triggers_QueryBuilder_Subcondition();
     if (strlen($this->logic_operator)) {
@@ -48,7 +49,7 @@ class CRM_Triggers_BAO_RuleScheduleTrigger extends CRM_Triggers_DAO_RuleSchedule
     }
     
     //add a join on civicrm_processed_trigger
-    $alreadyProcessedCond = new CRM_Triggers_QueryBuilder_Condition("`".$dao->tableName() ."`.`id` NOT IN ("
+    $alreadyProcessedCond = new CRM_Triggers_QueryBuilder_Condition("`".$daoClass::getTableName() ."`.`id` NOT IN ("
         . "SELECT `entity_id` FROM `civicrm_processed_trigger` "
         . "WHERE `entity` = '".$dao->escape($trigger->entity)."' "
         . "AND `trigger_action_id` = '".$dao->escape($this->id)."')");
@@ -56,8 +57,8 @@ class CRM_Triggers_BAO_RuleScheduleTrigger extends CRM_Triggers_DAO_RuleSchedule
     $where->addCond($alreadyProcessedCond);
     
     //add the conditions to the query builder
-    $qb->addWhere($where);
-    $qb->addHaving($having);
+    $builder->addWhere($where);
+    $builder->addHaving($having);
   }
   
 }
