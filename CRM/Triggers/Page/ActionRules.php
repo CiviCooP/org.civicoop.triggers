@@ -14,7 +14,7 @@ require_once 'CRM/Core/Page.php';
 
 class CRM_Triggers_Page_ActionRules extends CRM_Core_Page {
     function run() {
-        CRM_Utils_System::setTitle(ts('List of Acton Rules'));
+        CRM_Utils_System::setTitle(ts('List of Action Rules'));
         $this->assign('addUrl', CRM_Utils_System::url('civicrm/actionrules', 'action=add&reset=1', true));
         $rowHeaders = array('Label', 'Entity', 'Action', 'Parameters');
         $this->assign('rowHeaders', $rowHeaders);

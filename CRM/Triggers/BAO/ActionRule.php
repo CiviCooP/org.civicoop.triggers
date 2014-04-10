@@ -180,14 +180,11 @@ class CRM_Triggers_BAO_ActionRule extends CRM_Triggers_DAO_ActionRule {
      */
     public static function add($params) {
         $result = array();
-        CRM_Core_Error::debug('params', $params);
         if (empty($params)) {
             CRM_Core_Error::fatal('Params can not be empty when adding or updating an ActionRule');
         }
         $actionRule = new CRM_Triggers_BAO_ActionRule();
         $fields = self::fields();
-        CRM_Core_Error::debug("fields", $fields);
-        exit();
         foreach ($params as $paramKey => $paramValue) {
             if (isset($fields[$paramKey])) {
                 $actionRule->$paramKey = $paramValue;

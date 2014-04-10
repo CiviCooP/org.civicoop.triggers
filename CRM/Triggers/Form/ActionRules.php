@@ -143,6 +143,9 @@ class CRM_Triggers_Form_ActionRules extends CRM_Core_Form {
          * @todo find out why the heck exportValues does not give result
          */
         $values = $this->_submitValues;
+        CRM_Core_Error::debug("values", $values);
+        CRM_Core_Error::debug("action", $this->_action);
+        exit();
         if ($this->_action == CRM_Core_Action::UPDATE) {
             $saveActionParams['id'] = $this->_id;
         }
