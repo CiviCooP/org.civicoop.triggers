@@ -41,7 +41,8 @@ class CRM_Triggers_BAO_TriggerAction extends CRM_Triggers_DAO_TriggerAction {
     $trigger->whereAdd("id = '".$this->trigger_rule_id."'");
     $trigger->find(TRUE);
            
-    $dao = CRM_Triggers_BAO_TriggerRule::getEntityDAO($trigger->entity);
+    $daoClass = CRM_Triggers_BAO_TriggerRule::getEntityDAO($trigger->entity);
+    $dao = new $daoClass();
     //build condition for this dao
     
     $qb = new CRM_Triggers_QueryBuilder("`".$dao->tableName()."`");
@@ -71,7 +72,7 @@ class CRM_Triggers_BAO_TriggerAction extends CRM_Triggers_DAO_TriggerAction {
     $qb->addWhere($where);
     $qb->addHaving($having);
     
-    $entityDao = CRM_Core_DAO::executeQuery($qb->toSql());    
+    $entityDao = CRM_Core_DAO::executeQuery($qb->toSql(), array(), TRUE, $daoClass);    
     return $entityDao;
   }
     /**
