@@ -26,6 +26,10 @@ function civicrm_api3_trigger_action_process($params) {
   if (isset($params['limit'])) {
     $limit = $params['limit'];
   }
+  $debug = false;
+  if (isset($params['debug']) && $params['debug']) {
+    $debug = true;
+  }
   
   $rule_schedule = CRM_Triggers_BAO_RuleSchedule::findForProcessing(FALSE);
   $messages = array();
@@ -54,7 +58,14 @@ function civicrm_api3_trigger_action_process($params) {
       $messages[] = 'Trigger "'.$rule_schedule->label.'" processed resulting in '.$processedEntityCount.' executed action(s)';
     } catch (Exception $e) {
       $messages[] = "Trigger '".$rule_schedule->label."' had an error during processing";
-    }    
+      if ($debug) {
+        throw $e;
+      }
+    }
+    
+    if ($count >= $limit) {
+      break;
+    }
   }
   
   $params['message'] = 'Processed '.$count.' triggers. '.implode(' ', $messages);
