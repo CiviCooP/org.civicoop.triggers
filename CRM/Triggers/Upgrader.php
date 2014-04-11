@@ -164,8 +164,8 @@ class CRM_Triggers_Upgrader extends CRM_Triggers_Upgrader_Base {
   protected function getTagId($name) {
     try {
       $params['name'] = $name;
-      $activity_type = civicrm_api3('Tag', 'getsingle', $params);
-      return $activity_type['id'];
+      $tag = civicrm_api3('Tag', 'getsingle', $params);
+      return $tag['id'];
     } catch (Exception $e) {
       return false;
     }

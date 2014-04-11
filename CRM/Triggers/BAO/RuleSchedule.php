@@ -93,6 +93,12 @@ class CRM_Triggers_BAO_RuleSchedule extends CRM_Triggers_DAO_RuleSchedule {
         self::$processedTriggers[$this->id][$rule_schedule_trigger->id] = $rule_schedule_trigger->getTriggerRule();
       }
     }
+    
+    $hooks = CRM_Utils_Hook::singleton();
+    $hooks->invoke(3,
+      $this, $builder, self::$processedTriggers[$this->id], CRM_Utils_Hook::$_nullObject, CRM_Utils_Hook::$_nullObject,
+      'civicrm_trigger_pre_execute_entity_query'
+      );
 
     $entityDao = CRM_Core_DAO::executeQuery($builder->toSql(), array(), TRUE, $daoClass);
     
