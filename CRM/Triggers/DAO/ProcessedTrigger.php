@@ -38,8 +38,8 @@ class CRM_Triggers_DAO_ProcessedTrigger extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'required' => true,
         ) ,
-        'trigger_action_id' => array(
-          'name' => 'trigger_action_id',
+        'rule_schedule_id' => array(
+          'name' => 'rule_schedule_id',
           'type' => CRM_Utils_Type::T_INT,
           'required' => true,
         ) ,
@@ -76,7 +76,7 @@ class CRM_Triggers_DAO_ProcessedTrigger extends CRM_Core_DAO {
     if (!(self::$_fieldKeys)) {
       self::$_fieldKeys = array(
         'id' => 'id',
-        'trigger_action_id' => 'trigger_action_id',
+        'rule_schedule_id' => 'rule_schedule_id',
         'entity' => 'entity',
         'entity_id' => 'entity_id',
         'date_processed' => 'date_processed',

@@ -163,3 +163,18 @@ function triggers_civicrm_navigationMenu( &$params ) {
     _triggers_civix_insert_navigation_menu($params, 'Administer/Trigger Action Rules', $addTriggerAction);
     
 }
+
+/**
+ * Implement hook_civicrm_trigger_check_action_execution
+ * 
+ * So we can check if a conact has the tag automated handling
+ * 
+ * @param type $doProcessing
+ * @param type $objects
+ * @param type $params
+ * @param CRM_Triggers_BAO_ActionRule $action_rule
+ */
+function triggers_civicrm_trigger_check_action_execution(&$doProcessing, $objects, $params, CRM_Triggers_BAO_ActionRule $action_rule) {
+  $automated_handling = CRM_Triggers_Utils_AutomatedHandling::singleton();
+  $doProcessing = $automated_handling->checkActionExecution($objects, $params, $action_rule);
+}

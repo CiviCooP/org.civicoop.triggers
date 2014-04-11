@@ -13,6 +13,8 @@ class CRM_Triggers_Upgrader extends CRM_Triggers_Upgrader_Base {
    */
   public function install() {
     $this->executeSqlFile('sql/install.sql');
+    $this->addProcessedActivityType();
+    $this->addAutomatedHandlingTag();
   }
 
   /**
@@ -85,6 +87,100 @@ class CRM_Triggers_Upgrader extends CRM_Triggers_Upgrader_Base {
     // this path is relative to the extension base dir
     $this->executeSqlFile('sql/upgrade_1006.sql');
     return TRUE;
+  }
+  
+  /**
+   * Upgrade 1007
+   *
+   * @return TRUE on success
+   * @throws Exception
+   */ 
+  public function upgrade_1007() {
+    $this->ctx->log->info('Applying update 1007');
+    // this path is relative to the extension base dir
+    $this->executeSqlFile('sql/upgrade_1007.sql');
+    return TRUE;
+  }
+  
+  /**
+   * Upgrade 1008
+   *
+   * @return TRUE on success
+   * @throws Exception
+   */ 
+  public function upgrade_1008() {
+    $this->ctx->log->info('Applying update 1008');
+    // this path is relative to the extension base dir
+    $this->addAutomatedHandlingTag();
+    return TRUE;
+  }
+  
+  protected function addProcessedActivityType() {
+    $params = array (
+      'name' => 'TriggerProcessed',
+      'label' => 'Trigger processed',
+      'weight' => 1,
+      'is_active' => 1,
+    );
+    $this->createActivityType($params);
+  }
+  
+  protected function addAutomatedHandlingTag() {
+    $params = array (
+      'name' => 'Automated Handling',
+      'description' => 'Contact could be processed with the triggers',
+      'is_selectable' => 1,
+      'is_reserved' => 1,
+      'user_for' => 'civicrm_contact',
+    );
+    $this->createTag($params);
+  }
+  
+  protected function createTag($params) {
+    if (!isset($params['name'])) {
+      return;
+    }
+    
+    $tag_id = $this->getTagId($params['name']);
+    
+    if ($tag_id === false) {
+      civicrm_api3('Tag', 'create', $params);
+    }
+  }
+  
+  protected function createActivityType($params) {
+    if (!isset($params['name'])) {
+      return;
+    }
+    
+    $activity_id = $this->getActivityTypeId($params['name']);
+    if ($activity_id === false) {
+      $option_group = civicrm_api3('OptionGroup', 'getsingle', array('name' => 'activity_type'));
+      $params['option_group_id'] = $option_group['id'];
+      civicrm_api3('OptionValue', 'Create', $params); 
+    }          
+  }
+  
+  protected function getTagId($name) {
+    try {
+      $params['name'] = $name;
+      $tag = civicrm_api3('Tag', 'getsingle', $params);
+      return $tag['id'];
+    } catch (Exception $e) {
+      return false;
+    }
+  }
+  
+  protected function getActivityTypeId($name) {
+    try {
+      $option_group = civicrm_api3('OptionGroup', 'getsingle', array('name' => 'activity_type'));
+      $params['option_group_id'] = $option_group['id'];
+      $params['name'] = $name;
+      $activity_type = civicrm_api3('OptionValue', 'getsingle', $params);
+      return $activity_type['id'];
+    } catch (Exception $e) {
+      return false;
+    }
   }
 
   /**

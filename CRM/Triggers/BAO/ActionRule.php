@@ -22,25 +22,46 @@ class CRM_Triggers_BAO_ActionRule extends CRM_Triggers_DAO_ActionRule {
     }
 
     $processCount = 0;
+    $processedContacts = array();
     if ($this->process_contacts && count($contacts)) {
       foreach($contacts as $contact) {
         $objects = $entities;
         $objects['Contact'] = $contact;
         $params = $this->parseParams($objects, $rule_schedule);
-        civicrm_api3($this->entity, $this->action, $params);
-        $processCount++;
+        
+        if ($this->checkForProcessing($objects, $params)) {        
+          civicrm_api3($this->entity, $this->action, $params);
+          $processedContacts[$contact->id] = $contact;
+          $processCount++;
+        }
       }
     } else {
       $params = $this->parseParams($objects, $rule_schedule);
-      civicrm_api3($this->entity, $this->action, $params);
-      $processCount++;
+      if ($this->checkForProcessing($objects, $params)) {        
+        civicrm_api3($this->entity, $this->action, $params);
+        $processCount++;
+      }
     }
     
     //add an activity type and add this entity to the processed table        
       //we do that through the processed trigger BAO
-    CRM_Triggers_BAO_ProcessedTrigger::processTrigger($entities, $rule_schedule, $this, $contacts);
+    if ($processCount > 0) {
+      CRM_Triggers_BAO_ProcessedTrigger::processTrigger($entities, $rule_schedule, $this, $processedContacts);
+    }
     
     return $processCount;
+  }
+  
+  protected function checkForProcessing($objects, $params) {
+    $return = true;
+    
+    $hooks = CRM_Utils_Hook::singleton();
+    $hooks->invoke(4,
+      $return, $objects, $params, $this, CRM_Utils_Hook::$_nullObject,
+      'civicrm_trigger_check_action_execution'
+      );
+
+    return $return;
   }
   
   /**
