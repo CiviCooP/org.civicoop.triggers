@@ -15,6 +15,11 @@ class CRM_Triggers_QueryBuilder_Subcondition implements CRM_Triggers_QueryBuilde
   protected $subconditions = array();
   
   public function addCond(CRM_Triggers_QueryBuilder_ConditionInterface $cond) {
+    foreach($this->subconditions as $c) {
+      if ($c == $cond) {
+        return; //condition is already added
+      }
+    }
     $this->subconditions[] = $cond;
   }
   
