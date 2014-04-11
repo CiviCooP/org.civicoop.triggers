@@ -7,6 +7,7 @@ This example will show what the trigger/action parameters are.
 We want to achieve the following:
 
 - Every contact which first name is equal to John we want them to be added to the group 'Johns'. 
+- And when the contact has contributed something 7 days ago
 - This group has id 6.
 
 ###Trigger Rules
