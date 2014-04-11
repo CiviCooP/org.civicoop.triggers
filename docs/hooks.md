@@ -48,3 +48,11 @@ You can set parameters in the variable `$return`.
             $return['group_id'] = 21;//use group 21 for the action
         }
     }
+
+## civicrm_trigger_pre_execute_entity_query
+
+Todo
+
+## civicrm_trigger_check_action_execution
+
+Todo
