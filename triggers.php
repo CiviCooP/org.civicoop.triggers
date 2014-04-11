@@ -150,14 +150,14 @@ function triggers_civicrm_navigationMenu( &$params ) {
     
     $listTriggerAction = array(
         'name'          =>  ts('List Scheduled Trigger/Action Rules'),
-        'url'           =>  CRM_Utils_System::url('civicrm/triggeractionlist', '', true),
+        'url'           =>  CRM_Utils_System::url('civicrm/ruleschedulelist', '', true),
         'permission'    =>  'administer CiviCRM'
     );
     _triggers_civix_insert_navigation_menu($params, 'Administer/Trigger Action Rules', $listTriggerAction);
     
     $addTriggerAction = array(
         'name'          =>  ts('New Trigger/Action Rule'),
-        'url'           =>  CRM_Utils_System::url('civicrm/triggeraction', 'action=add&reset=1', true),
+        'url'           =>  CRM_Utils_System::url('civicrm/ruleschedule', 'action=add&reset=1', true),
         'permission'    =>  'administer CiviCRM'
     );
     _triggers_civix_insert_navigation_menu($params, 'Administer/Trigger Action Rules', $addTriggerAction);

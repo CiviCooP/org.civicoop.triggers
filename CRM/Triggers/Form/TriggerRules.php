@@ -222,7 +222,7 @@ class CRM_Triggers_Form_TriggerRules extends CRM_Core_Form {
 
     private function _listEntityFields() {
         if (isset($this->_entity) && !empty($this->_entity)) {
-            $daoEntity = CRM_Triggers_BAO_TriggerRule::getEntityDAO($this->_entity);
+            $daoEntity = CRM_Core_DAO_AllCoreTables::getFullName($this->_entity);
             $fields = $daoEntity::fields();
             foreach ($fields as $field) {
                 $result[] = $field['name'];
