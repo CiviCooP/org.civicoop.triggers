@@ -6,33 +6,39 @@
 class CRM_Triggers_BAO_ActionRule extends CRM_Triggers_DAO_ActionRule {
 
   /**
-   * Process the action for the given entity ($objRef)
-   * @param CRM_Core_DAO $objRef
+   * Process the action for the given entities
+   * 
+   * @param $entities array of CRM_Core_DAO entities
    */
-  public function processEntity(CRM_Core_DAO $objRef, CRM_Triggers_BAO_TriggerRule $trigger_rule, CRM_Triggers_BAO_TriggerAction $trigger_action) {
-    //set the objects array for processing
-    $objects[strtolower($trigger_rule->entity)] = $objRef;
-    
+  public function processEntities($entities, CRM_Triggers_BAO_RuleSchedule $rule_schedule) {
     //retrieve contacts from the entity
-    $contacts = CRM_Triggers_Utils::getContactsFromEntity($objRef);
+    $contacts = array();
+    if (!isset($entities['Contact'])) {
+      //only retrieve contacts if no contact is present in the set
+      $contacts = CRM_Triggers_Utils::getContactsFromEntities($entities);
+    } else {
+      $contact = $entities['Contact'];
+      $contacts[$contact->id] = $contact;
+    }
 
     $processCount = 0;
     if ($this->process_contacts && count($contacts)) {
       foreach($contacts as $contact) {
+        $objects = $entities;
         $objects['Contact'] = $contact;
-        $params = $this->parseParams($objects, $trigger_rule);
+        $params = $this->parseParams($objects, $rule_schedule);
         civicrm_api3($this->entity, $this->action, $params);
         $processCount++;
       }
     } else {
-      $params = $this->parseParams($objects, $trigger_rule);
+      $params = $this->parseParams($objects, $rule_schedule);
       civicrm_api3($this->entity, $this->action, $params);
       $processCount++;
     }
     
     //add an activity type and add this entity to the processed table        
       //we do that through the processed trigger BAO
-    CRM_Triggers_BAO_ProcessedTrigger::processTrigger($objRef, $trigger_rule, $trigger_action, $this, $contacts);
+    CRM_Triggers_BAO_ProcessedTrigger::processTrigger($entities, $rule_schedule, $this, $contacts);
     
     return $processCount;
   }
@@ -43,7 +49,7 @@ class CRM_Triggers_BAO_ActionRule extends CRM_Triggers_DAO_ActionRule {
    * @param array $objects array of objects identified by lower case entity name 'e.g. contribution'.
    * @return array
    */
-  protected function parseParams($objects, CRM_Triggers_BAO_TriggerRule $trigger_rule) {
+  protected function parseParams($objects, CRM_Triggers_BAO_RuleSchedule $rule_schedule) {
     $return = array();
     
     $p = explode("&", $this->params);
@@ -62,7 +68,7 @@ class CRM_Triggers_BAO_ActionRule extends CRM_Triggers_DAO_ActionRule {
     
     $hooks = CRM_Utils_Hook::singleton();
     $hooks->invoke(5,
-      $params, $return, $objects, $trigger_rule, $this,
+      $params, $return, $objects, $rule_schedule, $this,
       'civicrm_trigger_action_parse_params'
       );
     

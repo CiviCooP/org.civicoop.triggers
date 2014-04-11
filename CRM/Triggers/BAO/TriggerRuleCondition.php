@@ -56,13 +56,16 @@ class CRM_Triggers_BAO_TriggerRuleCondition extends CRM_Triggers_DAO_TriggerRule
    * @param CRM_Triggers_QueryBuilder $builder
    * @throws CRM_Triggers_Exception_InvalidCondition
    */
-  public function parseCondition(CRM_Triggers_QueryBuilder_Subcondition $where, CRM_Triggers_QueryBuilder_Subcondition $having, CRM_Triggers_QueryBuilder $builder, CRM_Core_DAO $entityDAO) {
+  public function parseCondition(CRM_Triggers_QueryBuilder_Subcondition $where, CRM_Triggers_QueryBuilder_Subcondition $having, CRM_Triggers_QueryBuilder $builder) {
+    $trigger = CRM_Triggers_BAO_TriggerRule::getDaoByTriggerRuleId($this->trigger_rule_id);
+    $entityDAO = $trigger->getEntityDAO();
+    $entityDAOClass = $trigger->getEntityDAOClass();
     
     //check if field exist in DAO    
     $sqlFieldName = false;
     $field = CRM_Triggers_Utils::getFieldFromDao($entityDAO, $this->field_name);
     if ($field !== false) {
-      $sqlFieldName = $this->parseField($field, $entityDAO->tableName(), $builder);
+      $sqlFieldName = $this->parseField($field, $entityDAOClass::getTableName(), $builder);
     }
     
     if ($sqlFieldName === false) {
@@ -88,7 +91,7 @@ class CRM_Triggers_BAO_TriggerRuleCondition extends CRM_Triggers_DAO_TriggerRule
       $sqlGroupingFieldName = false;
       $groupField = CRM_Triggers_Utils::getFieldFromDao($entityDAO, $this->field_name);    
       if ($groupField !== false) {
-        $sqlGroupingFieldName = $this->parseField($groupField, $entityDAO->tableName(), $builder);
+        $sqlGroupingFieldName = $this->parseField($groupField, $entityDAOClass::getTableName(), $builder);
       }
       
       if ($sqlGroupingFieldName === false) {
@@ -102,12 +105,12 @@ class CRM_Triggers_BAO_TriggerRuleCondition extends CRM_Triggers_DAO_TriggerRule
       $strCond .= " '".$entityDAO->escape($this->value)."'";
       
       $cond = new CRM_Triggers_QueryBuilder_Condition($strCond);
-      $where->addCond($cond);      
+      $where->addCond($cond);  
     }
     
     $hooks = CRM_Utils_Hook::singleton();
     $hooks->invoke(2,
-      $this, $builder, $where, $having, $entityDAO,
+      $this, $builder, $where, $having, $trigger,
       'civicrm_trigger_condition_parse'
       );
     
@@ -142,7 +145,7 @@ class CRM_Triggers_BAO_TriggerRuleCondition extends CRM_Triggers_DAO_TriggerRule
       $join = " LEFT JOIN `".$cgroup['table_name']."` AS `group_".$gid."` ON `".$table_name."`.`id` = `group_".$gid."`.`entity_id`";
       $builder->addJoin($join, "group_".$gid);
       $fieldName = "`group_".$gid."`.`".$cfield['column_name']."`";
-      $builder->addSelect("`group_".$gid."`.`".$cfield['column_name']."` AS `".$field['name']."`");
+      $builder->addSelect("`group_".$gid."`.`".$cfield['column_name']."` AS `".$table_name."_".$field['name']."`");
     }
     return $fieldName;
   }
