@@ -86,7 +86,7 @@ class CRM_Triggers_Form_ActionRule extends CRM_Core_Form {
     if ($this->_action == CRM_Core_Action::DELETE) {
       $this->_id = CRM_Utils_Request::retrieve('aid', 'Integer', $this);
       CRM_Triggers_BAO_ActionRule::deleteById($this->_id);
-      $session->setStatus('Action deleted', 'Delete', 'success');
+      $session->setStatus('Action Rule deleted', 'Delete', 'success');
       CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/actionruleslist'));
     }
     $apiEntities = civicrm_api3('Entity', 'Get', array());
@@ -104,16 +104,16 @@ class CRM_Triggers_Form_ActionRule extends CRM_Core_Form {
      */
     switch($this->_action) {
       case CRM_Core_Action::ADD:
-        $pageTitle = "New Action";
+        $pageTitle = "New Action Rule";
         break;
       case CRM_Core_Action::VIEW:
-        $pageTitle = "View Action";
+        $pageTitle = "View Action Rule";
         break;
       case CRM_Core_Action::UPDATE:
-        $pageTitle = "Update Action";
+        $pageTitle = "Update Action Rule";
         break;
       default:
-        $pageTitle = "Action";
+        $pageTitle = "Action Rule";
         break;
     }
     CRM_Utils_System::setTitle(ts($pageTitle));

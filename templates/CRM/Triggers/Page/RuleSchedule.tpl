@@ -4,7 +4,7 @@
     </div>
     <div class="action-link">
         <a class="button new-option" href="{$addUrl}">
-            <span><div class="icon add-icon"></div>Add Trigger/Action Rule </span>
+            <span><div class="icon add-icon"></div>New Schedule Rule</span>
         </a>
     </div>
     <div id="action-rule-wrapper" class="dataTables_wrapper">
@@ -24,11 +24,12 @@
                     <tr id="row{$row.id}" class={$rowClass}>
                         <td hidden="1">{$row.id}</td>
                         <td>{$row.label}</td>
-                        <td>{$row.triggers}</td>
-                        <td>{$row.action}</td>
+                        <td>{$row.rule_action}</td>
                         <td>{$row.schedule}</td>
-                        <td>{$row.start_date}</td>
-                        <td>{$row.end_date}</td>
+                        <td>{$row.start_date|crmDate}</td>
+                        <td>{$row.end_date|crmDate}</td>
+                        <td>{$row.last_run}</td>
+                        <td>{$row.next_run}</td>
                         <td>{$row.is_active}</td>
                         <td>
                             <span>
@@ -49,7 +50,7 @@
     </div>
     <div class="action-link">
         <a class="button new-option" href="{$addUrl}">
-            <span><div class="icon add-icon"></div>Add Trigger/Action Rule</span>
+            <span><div class="icon add-icon"></div>New Schedule Rule</span>
         </a>
     </div>
 </div>

@@ -21,6 +21,7 @@ class CRM_Triggers_Form_TriggerRules extends CRM_Core_Form {
     protected $_entities = array();
     protected $_entity = null;
     protected $_entityFields = array();
+    protected $_conditionOperations = array();
     
     function buildQuickForm() {
         
@@ -63,7 +64,7 @@ class CRM_Triggers_Form_TriggerRules extends CRM_Core_Form {
              * occur in the rendereableElements on the main form
              */
             $this->add('select', 'field_name', '', $this->_entityFields, true);
-            $this->add('text', 'operation');
+            $this->add('select', 'operation', '', $this->_conditionOperations, true);
             $this->add('text', 'value');
             $this->add('text', 'aggregate_function');
             $this->add('text', 'grouping_field');
@@ -103,10 +104,15 @@ class CRM_Triggers_Form_TriggerRules extends CRM_Core_Form {
         if ($this->_action == CRM_Core_Action::DELETE) {
             $this->_id = CRM_Utils_Request::retrieve('tid', 'Integer', $this);
             CRM_Triggers_BAO_TriggerRule::deleteById($this->_id);
-            $session->setStatus('Trigger deleted', 'Delete', 'success');
+            $session->setStatus('Trigger Rule deleted', 'Delete', 'success');
             CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/triggerruleslist'));
         }
-        $this->_entities = array('Activity', 'Contribution', 'GroupContact', 'Contact');
+        $validEntities = array('Activity', 'Contribution', 'GroupContact', 'Contact', 
+          'Email', 'Phone', 'Address');
+        sort($validEntities);
+        $this->_entities = $validEntities;
+        $this->_conditionOperations = array('=', '!=', '>', '>=', '<', '<=', 'LIKE', 
+          'IN', 'IS NULL', 'IS NOT NULL', 'IS EMPTY', 'IS NOT EMPTY' );
 
         /*
          * if action is not add, store trigger_rule_id in $this->_id
@@ -129,16 +135,16 @@ class CRM_Triggers_Form_TriggerRules extends CRM_Core_Form {
          */
         switch($this->_action) {
             case CRM_Core_Action::ADD:
-                $pageTitle = "New Trigger";
+                $pageTitle = "New Trigger Rule";
                 break;
             case CRM_Core_Action::VIEW:
-                $pageTitle = "View Trigger";
+                $pageTitle = "View Trigger Rule";
                 break;
             case CRM_Core_Action::UPDATE:
-                $pageTitle = "Update Trigger";
+                $pageTitle = "Update Trigger Rule";
                 break;
             default:
-                $pageTitle = "Trigger";
+                $pageTitle = "Trigger Rule";
                 break;
         }
         CRM_Utils_System::setTitle(ts($pageTitle));
@@ -161,7 +167,7 @@ class CRM_Triggers_Form_TriggerRules extends CRM_Core_Form {
                 $session->setStatus('Condition Added', 'Saved', 'success');
                 $saveConditionParams['trigger_rule_id'] = $savedTriggerRule['id'];
                 $saveConditionParams['field_name'] = CRM_Utils_Array::value($values['field_name'], $this->_entityFields);
-                $saveConditionParams['operation'] = $values['operation'];
+                $saveConditionParams['operation'] = CRM_Utils_Array::value($values['operation'], $this->_conditionOperations);
                 $saveConditionParams['value'] = $values['value'];
                 $saveConditionParams['aggregate_function'] = $values['aggregate_function'];
                 $saveConditionParams['grouping_field'] = $values['grouping_field'];                

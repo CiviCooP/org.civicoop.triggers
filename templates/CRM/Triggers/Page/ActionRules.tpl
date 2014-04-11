@@ -4,7 +4,7 @@
     </div>
     <div class="action-link">
         <a class="button new-option" href="{$addUrl}">
-            <span><div class="icon add-icon"></div>Add Action Rule</span>
+            <span><div class="icon add-icon"></div>New Action Rule</span>
         </a>
     </div>
     <div id="action-rule-wrapper" class="dataTables_wrapper">
@@ -46,7 +46,7 @@
     </div>
     <div class="action-link">
         <a class="button new-option" href="{$addUrl}">
-            <span><div class="icon add-icon"></div>Add Action Rule</span>
+            <span><div class="icon add-icon"></div>New Action Rule</span>
         </a>
     </div>
 </div>

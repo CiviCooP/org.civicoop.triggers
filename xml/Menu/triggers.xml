@@ -36,4 +36,10 @@
     <title>RuleSchedule</title>
     <access_arguments>access CiviCRM</access_arguments>
   </item>
+  <item>
+    <path>civicrm/ruleschedule</path>
+    <page_callback>CRM_Triggers_Form_RuleSchedule</page_callback>
+    <title>RuleSchedule</title>
+    <access_arguments>access CiviCRM</access_arguments>
+  </item>
 </menu>

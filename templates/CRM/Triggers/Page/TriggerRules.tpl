@@ -1,10 +1,10 @@
 <div class="crm-content-block crm-block">
     <div id="help">
-        The existing Triggers are listed below. You can view, add, edit or delete them from this screen. 
+        The existing Trigger Rules are listed below. You can view, add, edit or delete them from this screen. 
     </div>
     <div class="action-link">
         <a class="button new-option" href="{$addUrl}">
-            <span><div class="icon add-icon"></div>Add Trigger</span>
+            <span><div class="icon add-icon"></div>New Trigger Rule</span>
         </a>
     </div>
     <div id="trigger-wrapper" class="dataTables_wrapper">
@@ -46,7 +46,7 @@
     </div>
     <div class="action-link">
         <a class="button new-option" href="{$addUrl}">
-            <span><div class="icon add-icon"></div>Add Trigger</span>
+            <span><div class="icon add-icon"></div>New Trigger Rule</span>
         </a>
     </div>
 </div>

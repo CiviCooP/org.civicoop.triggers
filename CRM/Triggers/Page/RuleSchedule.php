@@ -14,9 +14,9 @@ require_once 'CRM/Core/Page.php';
 
 class CRM_Triggers_Page_RuleSchedule extends CRM_Core_Page {
     function run() {
-        CRM_Utils_System::setTitle(ts('List of Trigger/Action Rules'));
+        CRM_Utils_System::setTitle(ts('List of Scheduled Trigger/Action Rules'));
         $this->assign('addUrl', CRM_Utils_System::url('civicrm/ruleschedule', 'action=add&reset=1', true));
-        $rowHeaders = array('Label', 'Triggers', 'Action', 'Schedule', 'Start Date', 'End Date', 'Enabled');
+        $rowHeaders = array('Label', 'Action', 'Schedule', 'Start Date', 'End Date', 'Last Run', 'Next Run', 'Enabled');
         $this->assign('rowHeaders', $rowHeaders);
         
         $rows = array();
@@ -30,7 +30,7 @@ class CRM_Triggers_Page_RuleSchedule extends CRM_Core_Page {
             $row['label'] = $scheduleRow['label'];
             /*
              * get related Triggers
-             */
+             *
             $triggerRows = CRM_Triggers_BAO_RuleScheduleTrigger::getValues(array('rule_schedule_id' => $scheduleRow['id']));
             foreach ($triggerRows as $triggerRow) {
                 $rowChild = array();
@@ -38,12 +38,21 @@ class CRM_Triggers_Page_RuleSchedule extends CRM_Core_Page {
                 $rowChild['trigger_rule_id'] = $triggerRow['trigger_rule_id'];
                 $rowChild['andor'] = $triggerRow['andor'];
                 $row['triggers'][] = $rowChild;
+            }*/
+            $retrievedActionRule = CRM_Triggers_BAO_ActionRule::getByActionRuleId($scheduleRow['action_rule_id']);
+            if (!empty($retrievedActionRule)) {
+              $row['rule_action'] = $retrievedActionRule['label'];
             }
-            $row['action'] = $scheduleRow['action'];
             $row['schedule'] = $scheduleRow['schedule'];
             $row['start_date'] = $scheduleRow['start_date'];
             $row['end_date'] = $scheduleRow['end_date'];
-            $row['is_active'] = $scheduleRow['is_active'];
+            $row['last_run'] = $scheduleRow['last_run'];
+            $row['next_run'] = $scheduleRow['next_run'];
+            if ($scheduleRow['is_active'] == 1) {
+              $row['is_active'] = 'Yes';
+            } else {
+              $row['is_active'] = 'No';
+            }
             $rowActions = array();
             $viewUrl = CRM_Utils_System::url('civicrm/ruleschedule', 'action=view&reset=1&rsid='.$scheduleRow['id'], true);
             $editUrl = CRM_Utils_System::url('civicrm/ruleschedule', 'action=update&reset=1&rsid='.$scheduleRow['id'], true);

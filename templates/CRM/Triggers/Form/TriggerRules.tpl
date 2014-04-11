@@ -9,8 +9,6 @@
     </div>
     <table class="form-layout-compressed">
         <tbody>
-            {* FIELD EXAMPLE: OPTION 1 (AUTOMATIC LAYOUT) *}
-
             {foreach from=$elementNames item=elementName}
               <div class="crm-section">
                   <div class="label">{$form.$elementName.label}</div>

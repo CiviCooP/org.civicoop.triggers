@@ -170,5 +170,50 @@ class CRM_Triggers_BAO_RuleSchedule extends CRM_Triggers_DAO_RuleSchedule {
 
     $this->save();
   }
-
+  /**
+   * Function to add or update action rule
+   * 
+   * @author Erik Hommel (CiviCooP) <erik.hommel@civicoop.org>
+   * @date 11 Apr 2014
+   * @param array $params 
+   * @return array $result
+   * @access public
+   * @static
+   */
+  public static function add($params) {
+    $result = array();
+    if (empty($params)) {
+      CRM_Core_Error::fatal('Params can not be empty when adding or updating a RuleSchedule');
+    }
+    $ruleSchedule = new CRM_Triggers_BAO_RuleSchedule();
+    $fields = self::fields();
+    foreach ($params as $paramKey => $paramValue) {
+      if (isset($fields[$paramKey])) {
+        $ruleSchedule->$paramKey = $paramValue;
+      }
+    }
+    $ruleSchedule->reschedule();
+    $ruleSchedule->save();
+    self::storeValues($ruleSchedule, $result);
+    return $result;
+  }
+  /**
+   * Function to delete rule schedule
+   * 
+   * @author Erik Hommel (CiviCooP) <erik.hommel@civicoop.org>
+   * @date 11 Apr 2014
+   * @param int $ruleScheduleId 
+   * @return boolean
+   * @access public
+   * @static
+   */
+  public static function deleteById($ruleScheduleId) {
+    if (empty($ruleScheduleId)) {
+        throw new Exception('ruleScheduleId can not be empty when attempting to delete one');
+    }
+    $ruleSchedule = new CRM_Triggers_BAO_RuleSchedule();
+    $ruleSchedule->id = $ruleScheduleId;
+    $ruleSchedule->delete();
+    return TRUE;
+  }
 }

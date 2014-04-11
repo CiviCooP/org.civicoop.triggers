@@ -38,6 +38,20 @@ class CRM_Triggers_DAO_RuleSchedule extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'required' => true,
         ) ,
+        'label' => array(
+          'name' => 'label',
+          'type' => CRM_Utils_Type::T_STRING,
+          'required' => true,
+          'maxlength' => 255,
+          'size' => CRM_Utils_Type::HUGE,
+        ) ,
+        'name' => array(
+          'name' => 'name',
+          'type' => CRM_Utils_Type::T_STRING,
+          'required' => true,
+          'maxlength' => 255,
+          'size' => CRM_Utils_Type::HUGE,
+        ) ,
         'action_rule_id' => array(
           'name' => 'action_rule_id',
           'type' => CRM_Utils_Type::T_INT,
