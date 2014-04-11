@@ -46,29 +46,33 @@ class CRM_Triggers_BAO_RuleScheduleTrigger extends CRM_Triggers_DAO_RuleSchedule
   public function addTriggerConditionsToQueryBuilder(CRM_Triggers_QueryBuilder $builder) {
     //build condition for this dao
     $trigger = $this->getTriggerRule();
-    $dao = $trigger->getEntityDAO();
-    $daoClass = $trigger->getEntityDAOClass();
+    $wheres = new CRM_Triggers_QueryBuilder_Subcondition();
     $where = new CRM_Triggers_QueryBuilder_Subcondition();
     $having = new CRM_Triggers_QueryBuilder_Subcondition();
     if (strlen($this->logic_operator)) {
-      $where->linkToPrevious = $this->logic_operator;
+      $wheres->linkToPrevious = $this->logic_operator;
       $having->linkToPrevious = $this->logic_operator;
     }
     $conditions = CRM_Triggers_BAO_TriggerRuleCondition::findByTriggerRuleId($trigger->id);
+    $alreadyProcessedConditions = new CRM_Triggers_QueryBuilder_Subcondition();
+    $alreadyProcessedConditions->linkToPrevious = 'AND';
     while($conditions->fetch()) {
-      $conditions->parseCondition($where, $having, $builder, $trigger);
+      $parser = $conditions->getParser();
+      $parser->parseCondition($where, $having, $builder, $trigger);
+      $parser->addAlreadyProcessedCondition($alreadyProcessedConditions, $this);
     }
     
-    //add a join on civicrm_processed_trigger
-    $alreadyProcessedCond = new CRM_Triggers_QueryBuilder_Condition("`".$daoClass::getTableName() ."`.`id` NOT IN ("
-        . "SELECT `entity_id` FROM `civicrm_processed_trigger` "
-        . "WHERE `entity` = '".$dao->escape($trigger->entity)."' "
-        . "AND `trigger_action_id` = '".$dao->escape($this->id)."')");
+    $hooks = CRM_Utils_Hook::singleton();
+    $hooks->invoke(5,
+      $this, $builder, $where, $having, $trigger,
+      'civicrm_trigger_condition_parse'
+      );
     
-    $where->addCond($alreadyProcessedCond);
+    $wheres->addCond($where);    
+    $wheres->addCond($alreadyProcessedConditions);
     
     //add the conditions to the query builder
-    $builder->addWhere($where);
+    $builder->addWhere($wheres);
     $builder->addHaving($having);
   }
   

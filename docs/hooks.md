@@ -6,7 +6,7 @@ This hook is invoked on the moment the condition is parsed to a sql condition on
 
 ### Parameters
 
-1. `CRM_Triggers_BAO_TriggerRuleCondition $condition`
+1. `CRM_Triggers_BAO_TriggerRuleSchedule $rule_schedule`
 2. `CRM_Triggers_QueryBuilder $builder`
 3. `CRM_Triggers_QueryBuilder_Subcondition $where`
 4. `CRM_Triggers_QueryBuilder_Subcondition $having`
@@ -16,8 +16,8 @@ This hook is invoked on the moment the condition is parsed to a sql condition on
 
 Below an example of usage of hook which will set the is_active condition on the dao when the field_name is contact_id. This example is probably useless :-)
 
-    function hook_civicrm_trigger_condition_parse(CRM_Triggers_BAO_TriggerRuleCondition $condition, CRM_Triggers_QueryBuilder $builder CRM_Triggers_QueryBuilder_Subcondition $where, CRM_Triggers_QueryBuilder_Subcondition $having, CRM_Triggers_BAO_TriggerRule $trigger_rule) {
-        if ($condition->field_name == 'contact_id') {
+    function hook_civicrm_trigger_condition_parse(CRM_Triggers_BAO_TriggerRuleSchedule $rule_schedule, CRM_Triggers_QueryBuilder $builder CRM_Triggers_QueryBuilder_Subcondition $where, CRM_Triggers_QueryBuilder_Subcondition $having, CRM_Triggers_BAO_TriggerRule $trigger_rule) {
+        if ($rule_schedule->name == 'start_donor_journey') {
             $cond = new CRM_Triggers_QueryBuilder_Condition("is_active = 1");
             $where->addCondition($cond); //only active contacts
         }

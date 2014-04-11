@@ -69,6 +69,7 @@ CREATE TABLE IF NOT EXISTS `civicrm_trigger_rule_condition` (
   `trigger_rule_id` int(11) unsigned NOT NULL,
   `field_name` varchar(255) NOT NULL,
   `value` text NOT NULL,
+  `special_processing` TINYINT(255) NOT NULL DEFAULT  '0',
   `operation` varchar(255) NOT NULL,
   `aggregate_function` varchar(255) DEFAULT NULL,
   `grouping_field` varchar(255) DEFAULT NULL,

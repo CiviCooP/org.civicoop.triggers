@@ -1,0 +1,1 @@
+ALTER TABLE  `civicrm_trigger_rule_condition` ADD  `special_processing` TINYINT( 255 ) NOT NULL DEFAULT  '0' AFTER  `value` ;
