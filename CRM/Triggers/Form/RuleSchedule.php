@@ -47,11 +47,18 @@ class CRM_Triggers_Form_RuleSchedule extends CRM_Core_Form {
     $saveScheduleParams['schedule'] = $values['schedule'];
     $saveScheduleParams['start_date'] = CRM_Utils_Date::processDate($values['start_date'].$values['start_date_time']);
     $saveScheduleParams['end_date'] = CRM_Utils_Date::processDate($values['end_date'].$values['end_date_time']);
-    $saveScheduleParams['is_active'] = $values['is_active'];
-
-    CRM_Triggers_BAO_RuleSchedule::add($saveScheduleParams);
+    if (isset($values['is_active'])) {
+      $saveScheduleParams['is_active'] = $values['is_active'];
+    }
+    $savedRuleSchedule = CRM_Triggers_BAO_RuleSchedule::add($saveScheduleParams);
     $session = CRM_Core_Session::singleton();
-    $session->setStatus('Rule Schedule (with related Triggers) Saved', 'Saved', 'success');
+    if ($this->_action == CRM_Core_Action::ADD) {
+      $session->setStatus('Rule Schedule Saved', 'Saved', 'success');
+      $session->pushUserContext(CRM_Utils_System::url('civicrm/ruleschedule', 'action=update&rsid='.$savedRuleSchedule['id'], true));
+    } else {
+      $session = CRM_Core_Session::singleton();
+      $session->setStatus('Rule Schedule (with related Triggers) Saved', 'Saved', 'success');
+    }
     parent::postProcess();
   }
   /*

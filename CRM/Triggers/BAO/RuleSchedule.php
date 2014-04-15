@@ -156,6 +156,7 @@ class CRM_Triggers_BAO_RuleSchedule extends CRM_Triggers_DAO_RuleSchedule {
     }
     $ruleSchedule->find();
     while ($ruleSchedule->fetch()) {
+      $row = array();
       self::storeValues($ruleSchedule, $row);
       $result[$row['id']] = $row;
     }
@@ -201,6 +202,7 @@ class CRM_Triggers_BAO_RuleSchedule extends CRM_Triggers_DAO_RuleSchedule {
     $ruleSchedule->reschedule();
     $ruleSchedule->save();
     self::storeValues($ruleSchedule, $result);
+    unset($ruleSchedule);
     return $result;
   }
   /**
