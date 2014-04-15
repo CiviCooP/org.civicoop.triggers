@@ -24,6 +24,7 @@ class CRM_Triggers_Form_RuleSchedule extends CRM_Core_Form {
   protected $_logicOperators = array();
   protected $_actionRules = array();
   protected $_triggerRules = array();
+  protected $_hasTriggers = FALSE;
   
   function buildQuickForm() {
     /*
@@ -56,8 +57,23 @@ class CRM_Triggers_Form_RuleSchedule extends CRM_Core_Form {
       $session->setStatus('Rule Schedule Saved', 'Saved', 'success');
       $session->pushUserContext(CRM_Utils_System::url('civicrm/ruleschedule', 'action=update&rsid='.$savedRuleSchedule['id'], true));
     } else {
-      $session = CRM_Core_Session::singleton();
-      $session->setStatus('Rule Schedule (with related Triggers) Saved', 'Saved', 'success');
+      if ($values['_qf_RuleSchedule_next'] == 'Schedule Trigger') {
+        $session->setStatus('Trigger Scheduled', 'Saved', 'success');
+        $saveTriggerParams['rule_schedule_id'] = $savedRuleSchedule['id'];
+        $saveTriggerParams['trigger_rule_id'] = $values['rule_schedule_trigger'];
+        if (isset($values['logic_operator'])) {
+          if ($values['logic_operator'] == 1) {
+            $saveTriggerParams['logic_operator'] = 'OR';
+          } else {
+            $saveTriggerParams['logic_operator'] = 'AND';
+          }
+        }
+        CRM_Triggers_BAO_RuleScheduleTrigger::add($saveTriggerParams);
+        $session->pushUserContext(CRM_Utils_System::url('civicrm/ruleschedule', 'action=update&rsid='.$savedRuleSchedule['id'], true));            
+      } else {
+          $session->setStatus('Rule Schedule and Triggers Saved', 'Saved', 'success');
+          $session->pushUserContext(CRM_Utils_System::url('civicrm/ruleschedulelist', '', true));
+      }
     }
     parent::postProcess();
   }
@@ -125,6 +141,13 @@ class CRM_Triggers_Form_RuleSchedule extends CRM_Core_Form {
     $this->addDateTime('end_date', ts('End Date'), false);
     $this->addDateTime('last_run', ts('Date Last Run'), false);
     $this->addDateTime('next_run', ts('Date Next Run'), false);
+    /*
+     * set elements for new rule schedule trigger
+     */
+    if ($this->_hasTriggers == true) {
+      $this->add('select', 'logic_operator', ts('Logic Operator'), array('AND', 'OR'), true);
+    }
+    $this->add('select', 'rule_schedule_trigger', ts('Trigger'), $this->_triggerRules, true);
     $this->addButtons(array(
       array('type' => 'next', 'name' => ts('Save'), 'isDefault' => true,),
       array('type' => 'cancel', 'name' => ts('Cancel'))));
@@ -138,6 +161,7 @@ class CRM_Triggers_Form_RuleSchedule extends CRM_Core_Form {
      */
     $session = CRM_Core_Session::singleton();
     $session->pushUserContext(CRM_Utils_System::url('civicrm/ruleschedulelist'));
+    $this->_hasTriggers = false;
     /*
      * if action is not add, store action_id in $this->_id
      */
@@ -149,14 +173,15 @@ class CRM_Triggers_Form_RuleSchedule extends CRM_Core_Form {
       $scheduledTriggerRows = CRM_Triggers_BAO_RuleScheduleTrigger::getValues(array('rule_schedule_id' => $this->_id));
       foreach ($scheduledTriggerRows as &$scheduledTriggerRow) {
         $scheduledTriggerRow = $this->setScheduledTriggerRow($scheduledTriggerRow);
+        if ($this->_hasTriggers == false) {
+          $this->_hasTriggers = true;
+        }
       }
       $this->assign('scheduledTriggerRows', $scheduledTriggerRows);
       $triggerHeaders = array('', 'Trigger', 'Trigger Entity', 'Trigger Conditions');
       $this->assign('triggerHeaders', $triggerHeaders);
     }
-
-      
-      /*
+    /*
      * if action = delete, execute delete immediately
      */
     if ($this->_action == CRM_Core_Action::DELETE) {
@@ -171,6 +196,14 @@ class CRM_Triggers_Form_RuleSchedule extends CRM_Core_Form {
     foreach ($actionRules as $actionRule) {
       $actionLabel = $actionRule['label'].' {entity:'.$actionRule['entity'].'-action:'.$actionRule['action'].'}';
       $this->_actionRules[$actionRule['id']] = $actionLabel;
+    }
+    /*
+     * retrieve all valid trigger rules
+     */
+    $triggerRules = CRM_Triggers_BAO_TriggerRule::getValues(array());
+    foreach ($triggerRules as $triggerRule) {
+      $triggerLabel = $triggerRule['label'].' {entity: '.$triggerRule['entity'].'}';
+      $this->_triggerRules[$triggerRule['id']] = $triggerLabel;
     }
     /*
      * set page title based on action

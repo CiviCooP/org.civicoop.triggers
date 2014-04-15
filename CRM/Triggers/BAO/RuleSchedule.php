@@ -178,7 +178,7 @@ class CRM_Triggers_BAO_RuleSchedule extends CRM_Triggers_DAO_RuleSchedule {
     $this->save();
   }
   /**
-   * Function to add or update action rule
+   * Function to add or update rule schedule
    * 
    * @author Erik Hommel (CiviCooP) <erik.hommel@civicoop.org>
    * @date 11 Apr 2014

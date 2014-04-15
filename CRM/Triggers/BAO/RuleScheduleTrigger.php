@@ -103,6 +103,33 @@ class CRM_Triggers_BAO_RuleScheduleTrigger extends CRM_Triggers_DAO_RuleSchedule
     }
     return $result;
   }
+  /**
+   * Function to add or update rule schedule trigger
+   * 
+   * @author Erik Hommel (CiviCooP) <erik.hommel@civicoop.org>
+   * @date 15 Apr 2014
+   * @param array $params 
+   * @return array $result
+   * @access public
+   * @static
+   */
+  public static function add($params) {
+    $result = array();
+    if (empty($params)) {
+      CRM_Core_Error::fatal('Params can not be empty when adding or updating a RuleScheduleTrigger');
+    }
+    $ruleScheduleTrigger = new CRM_Triggers_BAO_RuleScheduleTrigger();
+    $fields = self::fields();
+    foreach ($params as $paramKey => $paramValue) {
+      if (isset($fields[$paramKey])) {
+        $ruleScheduleTrigger->$paramKey = $paramValue;
+      }
+    }
+    $ruleScheduleTrigger->save();
+    self::storeValues($ruleScheduleTrigger, $result);
+    unset($ruleScheduleTrigger);
+    return $result;
+  }
   
 }
 
