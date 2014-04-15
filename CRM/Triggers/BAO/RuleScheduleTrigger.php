@@ -75,6 +75,34 @@ class CRM_Triggers_BAO_RuleScheduleTrigger extends CRM_Triggers_DAO_RuleSchedule
     $builder->addWhere($wheres);
     $builder->addHaving($having);
   }
+  /**
+   * Function to get schedule triggers
+   * 
+   * @author Erik Hommel (CiviCooP) <erik.hommel@civicoop.org>
+   * @date 14 Apr 2014
+   * @param array $params name/value pairs with field names/values
+   * @return array $result found rows with data
+   * @access public
+   * @static
+   */
+  public static function getValues($params) {
+    $result = array();
+    $ruleScheduleTrigger = new CRM_Triggers_BAO_RuleScheduleTrigger();
+    if (!empty($params)) {
+      $fields = self::fields();
+      foreach ($params as $paramKey => $paramValue) {
+        if (isset($fields[$paramKey])) {
+          $ruleScheduleTrigger->$paramKey = $paramValue;
+        }
+      }
+    }
+    $ruleScheduleTrigger->find();
+    while ($ruleScheduleTrigger->fetch()) {
+      self::storeValues($ruleScheduleTrigger, $row);
+      $result[$row['id']] = $row;
+    }
+    return $result;
+  }
   
 }
 

@@ -41,7 +41,8 @@ class CRM_Triggers_Page_RuleSchedule extends CRM_Core_Page {
             }*/
             $retrievedActionRule = CRM_Triggers_BAO_ActionRule::getByActionRuleId($scheduleRow['action_rule_id']);
             if (!empty($retrievedActionRule)) {
-              $row['rule_action'] = $retrievedActionRule['label'];
+              $row['rule_action'] = $retrievedActionRule['label'].' {entity:'.
+                  $retrievedActionRule['entity'].'-action:'.$retrievedActionRule['action'].'}';
             }
             $row['schedule'] = $scheduleRow['schedule'];
             $row['start_date'] = $scheduleRow['start_date'];

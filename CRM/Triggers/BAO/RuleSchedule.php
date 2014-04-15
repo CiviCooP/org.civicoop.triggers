@@ -145,18 +145,18 @@ class CRM_Triggers_BAO_RuleSchedule extends CRM_Triggers_DAO_RuleSchedule {
    */
   public static function getValues($params) {
     $result = array();
-    $rule_schedule = new CRM_Triggers_BAO_RuleSchedule();
+    $ruleSchedule = new CRM_Triggers_BAO_RuleSchedule();
     if (!empty($params)) {
       $fields = self::fields();
       foreach ($params as $paramKey => $paramValue) {
         if (isset($fields[$paramKey])) {
-          $rule_schedule->$paramKey = $paramValue;
+          $ruleSchedule->$paramKey = $paramValue;
         }
       }
     }
-    $rule_schedule->find();
-    while ($rule_schedule->fetch()) {
-      self::storeValues($rule_schedule, $row);
+    $ruleSchedule->find();
+    while ($ruleSchedule->fetch()) {
+      self::storeValues($ruleSchedule, $row);
       $result[$row['id']] = $row;
     }
     return $result;
@@ -221,5 +221,26 @@ class CRM_Triggers_BAO_RuleSchedule extends CRM_Triggers_DAO_RuleSchedule {
     $ruleSchedule->id = $ruleScheduleId;
     $ruleSchedule->delete();
     return TRUE;
+  }
+  /**
+   * Function to get single rule schedule with ruleScheduleId
+   * 
+   * @author Erik Hommel (CiviCooP) <erik.hommel@civicoop.org>
+   * @date 14 Apr 2014
+   * @param int $ruleScheduleId
+   * @return array $result found row with data
+   * @access public
+   * @static
+   */
+  public static function getByRuleScheduleId($ruleScheduleId) {
+    $result = array();
+    if (empty($ruleScheduleId)) {
+      return $result;
+    }
+    $ruleSchedule = new CRM_Triggers_BAO_RuleSchedule();
+    $ruleSchedule->id = $ruleScheduleId;
+    $ruleSchedule->find(true);
+    self::storeValues($ruleSchedule, $result);
+    return $result;
   }
 }

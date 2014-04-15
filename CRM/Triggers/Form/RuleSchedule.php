@@ -19,14 +19,13 @@ require_once 'CRM/Core/Form.php';
  */
 class CRM_Triggers_Form_RuleSchedule extends CRM_Core_Form {
   /*
-   * class attribute to hold possible logic operators, action rules and trigger rules
+   * class attribute to hold possible date type, logic operators, action rules and trigger rules
    */
   protected $_logicOperators = array();
   protected $_actionRules = array();
   protected $_triggerRules = array();
   
   function buildQuickForm() {
-    $this->preProcess();
     /*
      * add elements to the form
      */
@@ -34,7 +33,7 @@ class CRM_Triggers_Form_RuleSchedule extends CRM_Core_Form {
     /*
      * set default values
      */
-    $this->setDefaultValues();
+    //$this->setDefaultValues();
     parent::buildQuickForm();
   }
 
@@ -73,17 +72,14 @@ class CRM_Triggers_Form_RuleSchedule extends CRM_Core_Form {
    * set form elements for view action
    */
   function setViewElements() {
-    $this->add('text', 'label', ts('Label'), array(
-      'size'      => CRM_Utils_Type::HUGE,
-      'readonly'  => 'readonly'), true);
-
-    $this->add('text', 'action_rule', ts('Action Rule'), array('readonly'  => 'readonly'), false);
+    $this->add('text', 'label', ts('Label'), array(), false);
+    $this->add('text', 'action_rule', ts('Action Rule'), array(), false);
     $this->add('text', 'schedule', ts('Schedule'), array('readonly'  => 'readonly'), false);
     $this->addDate('start_date', ts('Start Date'), false);
     $this->addDate('end_date', ts('End Date'), false);
     $this->addDate('last_run', ts('Date Last Run'), false);
     $this->addDate('next_run', ts('Date Next Run'), false);
-    $this->add('text', 'is_active', ts('Enabled?'), array('readonly' => 'readonly'), false);
+    $this->add('text', 'is_active', ts('Enabled?', array('readonly' => 'readonly', false)));
     $this->addButtons(array(array(
       'type' => 'cancel',
       'name' => ts('Done'),
@@ -136,10 +132,27 @@ class CRM_Triggers_Form_RuleSchedule extends CRM_Core_Form {
     $session = CRM_Core_Session::singleton();
     $session->pushUserContext(CRM_Utils_System::url('civicrm/ruleschedulelist'));
     /*
+     * if action is not add, store action_id in $this->_id
+     */
+    if ($this->_action != CRM_Core_Action::ADD) {
+      $this->_id = CRM_Utils_Request::retrieve('rsid', 'Integer', $this);
+      /*
+       * retrieve all scheduled triggers related to this rule schedule
+       */
+      $scheduledTriggerRows = CRM_Triggers_BAO_RuleScheduleTrigger::getValues(array('rule_schedule_id' => $this->_id));
+      foreach ($scheduledTriggerRows as &$scheduledTriggerRow) {
+        $scheduledTriggerRow = $this->setScheduledTriggerRow($scheduledTriggerRow);
+      }
+      $this->assign('scheduledTriggerRows', $scheduledTriggerRows);
+      $triggerHeaders = array('', 'Trigger', 'Trigger Entity', 'Trigger Conditions');
+      $this->assign('triggerHeaders', $triggerHeaders);
+    }
+
+      
+      /*
      * if action = delete, execute delete immediately
      */
     if ($this->_action == CRM_Core_Action::DELETE) {
-      $this->_id = CRM_Utils_Request::retrieve('rsid', 'Integer', $this);
       CRM_Triggers_BAO_RuleSchedule::deleteById($this->_id);
       $session->setStatus('Rule Schedule deleted', 'Delete', 'success');
       CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/ruleschedulelist'));
@@ -149,14 +162,8 @@ class CRM_Triggers_Form_RuleSchedule extends CRM_Core_Form {
      */
     $actionRules = CRM_Triggers_BAO_ActionRule::getValues(array());
     foreach ($actionRules as $actionRule) {
-      $actionLabel = $actionRule['label'].'{entity:'.$actionRule['entity'].'-action:'.$actionRule['action'].'}';
+      $actionLabel = $actionRule['label'].' {entity:'.$actionRule['entity'].'-action:'.$actionRule['action'].'}';
       $this->_actionRules[$actionRule['id']] = $actionLabel;
-    }
-    /*
-     * if action is not add, store action_id in $this->_id
-     */
-    if ($this->_action != CRM_Core_Action::ADD) {
-      $this->_id = CRM_Utils_Request::retrieve('aid', 'Integer', $this);
     }
     /*
      * set page title based on action
@@ -184,6 +191,7 @@ class CRM_Triggers_Form_RuleSchedule extends CRM_Core_Form {
     $defaults = array();
     if (isset($this->_id)) {
       $scheduleRule = CRM_Triggers_BAO_RuleSchedule::getByRuleScheduleId($this->_id);
+      
       if (isset($scheduleRule['id'])) {
         $defaults['id'] = $scheduleRule['id'];
       }
@@ -192,11 +200,11 @@ class CRM_Triggers_Form_RuleSchedule extends CRM_Core_Form {
       }
       if (isset($scheduleRule['action_rule_id'])) {
         if ($this->_action == CRM_Core_Action::UPDATE) {
-          $ruleAction = CRM_Utils_Array::value($scheduleRule['action_rule_id'], $this->_actionRules);
+          $ruleAction = $scheduleRule['action_rule_id'];
         } else {
-          $ruleAction = $scheduleRule['entity'];
+          $ruleAction = CRM_Utils_Array::value($scheduleRule['action_rule_id'], $this->_actionRules);
         }
-        $defaults['entity'] = $ruleAction;
+        $defaults['action_rule'] = $ruleAction;
       }
       if (isset($scheduleRule['schedule'])) {
         $defaults['schedule'] = $scheduleRule['schedule'];
@@ -208,20 +216,67 @@ class CRM_Triggers_Form_RuleSchedule extends CRM_Core_Form {
         $defaults['next_run'] = $scheduleRule['next_run'];
       }
       if (isset($scheduleRule['start_date'])) {
-        $defaults['start_date'] = $scheduleRule['start_date'];
+        if ($this->_action == CRM_Core_Action::VIEW) {
+          if (empty($scheduleRule['start_date'])) {
+            $defaults['start_date'] = "";
+          } else {
+            $defaults['start_date'] = $scheduleRule['start_date'];
+          }
+        } else {
+          list($defaults['start_date'], $defaults['start_date_time']) = CRM_Utils_Date::setDateDefaults($scheduleRule['start_date']);
+        }
       }
-      if (isset($scheduleRule['next_run'])) {
-        $defaults['end_date'] = $scheduleRule['end_date'];
+      if (isset($scheduleRule['end_date'])) {
+        if ($this->_action == CRM_Core_Action::VIEW) {
+          if (empty($scheduleRule['end_date'])) {
+            $defaults['end_date'] = "";
+          } else {
+            $defaults['end_date'] = $scheduleRule['end_date'];
+          }
+        } else {
+          list($defaults['end_date'], $defaults['end_date_time']) = CRM_Utils_Date::setDateDefaults($scheduleRule['end_date']);
+        }
       }
       if (isset($scheduleRule['is_active'])) {
         $defaults['is_active'] = $scheduleRule['is_active'];
       }    
     } else {
       $defaults['is_active'] = 1;
-      //list($defaults['start_date']) = CRM_Utils_Date::setDateDefaults(CRM_Utils_Date::getToday());
-      //$defaults('end_date') = date('Ymd', strtotime('+ 1 year'));
     }
     return $defaults;
+  }
+  function setScheduledTriggerRow($scheduledTriggerRow) {
+    /*
+     * set delete function for row
+     */
+    $scheduledTriggerRow['delete'] = CRM_Utils_System::url('civicrm/rulescheduletriggerdelete', 
+      'rsid='.$this->_id.'&rstid='.$scheduledTriggerRow['id'], true);
+    if (!isset($scheduledTriggerRow['logic_operator'])) {
+      $scheduledTriggerRow['logic_operator'] = null;
+    }
+    /*
+     * retrieve data for trigger rule
+     */
+    $scheduledTrigger = CRM_Triggers_BAO_TriggerRule::getByTriggerRuleId($scheduledTriggerRow['trigger_rule_id']);
+    if (!empty($scheduledTrigger)) {
+      $scheduledTriggerRow['trigger_label'] = $scheduledTrigger['label'];
+      $scheduledTriggerRow['trigger_entity'] = $scheduledTrigger['entity'];
+      $scheduledTriggerConditions = CRM_Triggers_BAO_TriggerRuleCondition::getValues(
+          array('trigger_rule_id' => $scheduledTriggerRow['trigger_rule_id']));
+      $conditionRows = array();
+      foreach($scheduledTriggerConditions as $conditionId => $condition) {
+        $conditionRow = $condition['field_name'].' '.$condition['operation'].' '.$condition['value'];
+        if (isset($condition['aggregate_function']) && !empty($condition['aggregate_function'])) {
+          $conditionRow .= ' AGGREGATE FUNCTION '.$condition['aggregate_function'];
+        }
+        if (isset($condition['grouping_field']) && !empty($condition['grouping_field'])) {
+          $conditionRow .= ' GROUP BY '.$condition['grouping_field'];
+        }
+        $conditionRows[] = $conditionRow;
+      }
+      $scheduledTriggerRow['trigger_conditions'] = $conditionRows;
+    }
+    return $scheduledTriggerRow;
   }
 }
 
