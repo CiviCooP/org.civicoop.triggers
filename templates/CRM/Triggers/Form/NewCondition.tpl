@@ -25,7 +25,7 @@
 </div>
 {literal}
   <script type="text/javascript">
-    cj("form").submit(function($) {
+    cj('#save-condition').clicked(function($) {
       var validationPassed = true;
       // if operation is 'normal' arithmetic, value can not be empty
       if (cj('#operation').prop('selectedIndex') < 8 && cj('#value').val() === '') {
