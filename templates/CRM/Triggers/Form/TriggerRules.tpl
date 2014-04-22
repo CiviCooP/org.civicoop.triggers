@@ -31,4 +31,17 @@
     <div class="crm-submit-buttons">
     {include file="CRM/common/formButtons.tpl" location="bottom"}
     </div>
-</div
+</div>
+{literal}
+  <script type="text/javascript">
+    cj("form").submit(function($) {
+      if (!cj('#label').val()) {
+        cj("#label").focus();
+        CRM.alert("Label for Trigger Rule can not be empty!", "Label Empty", "error");
+        $.preventDefault();
+      } else {
+          return true;
+      }
+    });
+  </script>
+{/literal}
