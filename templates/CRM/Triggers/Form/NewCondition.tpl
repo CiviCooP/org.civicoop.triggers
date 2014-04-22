@@ -27,15 +27,19 @@
   <script type="text/javascript">
     cj("form").submit(function($) {
       var validationPassed = true;
+      // if operation is 'normal' arithmetic, value can not be empty
       if (cj('#operation').prop('selectedIndex') < 8 && cj('#value').val() === '') {
         cj('#value').focus();
         CRM.alert('Value can not be empty when operation is not one of (IS NULL, IS NOT NULL, IS EMPTY, IS NOT EMPTY', 'Incorrect operation/value', 'error');
         validationPassed = false;
-      } 
-      if (cj('#operation').prop('selectedIndex') >= 8 && cj('#value').val() !== '') {
-        cj('#value').focus();
-        CRM.alert('Value has to be empty when operation is one of (IS NULL, IS NOT NULL, IS EMPTY, IS NOT EMPTY', 'Incorrect operation/value', 'error');
-        validationPassed = false;
+      }
+      // if operation is logic, value and aggregate_function have to be empty
+      if (cj('#operation').prop('selectedIndex') >= 8) {
+        if (cj('#value').val() !== '' || cj('#aggregate_function').val() !== '') {
+          cj('#value').focus();
+          CRM.alert('Value and aggregate function have to be empty when operation is one of (IS NULL, IS NOT NULL, IS EMPTY, IS NOT EMPTY', 'Incorrect operation/value', 'error');
+          validationPassed = false;
+        }
       }
       if (validationPassed === false) {
         $.preventDefault();
