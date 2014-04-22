@@ -23,3 +23,25 @@
         </tbody>
     </table>
 </div>
+{literal}
+  <script type="text/javascript">
+    cj("form").submit(function($) {
+      var validationPassed = true;
+      if (cj('#operation').prop('selectedIndex') < 8 && cj('#value').val() === '') {
+        cj('#value').focus();
+        CRM.alert('Value can not be empty when operation is not one of (IS NULL, IS NOT NULL, IS EMPTY, IS NOT EMPTY', 'Incorrect operation/value', 'error');
+        validationPassed = false;
+      } 
+      if (cj('#operation').prop('selectedIndex') >= 8 && cj('#value').val() !== '') {
+        cj('#value').focus();
+        CRM.alert('Value has to be empty when operation is one of (IS NULL, IS NOT NULL, IS EMPTY, IS NOT EMPTY', 'Incorrect operation/value', 'error');
+        validationPassed = false;
+      }
+      if (validationPassed === false) {
+        $.preventDefault();
+      } else {
+        return true;
+      }
+    });
+  </script>
+{/literal}

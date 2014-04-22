@@ -34,7 +34,7 @@
 </div>
 {literal}
   <script type="text/javascript">
-    cj("form").submit(function($) {
+    cj('form').submit(function($) {
       if (!cj('#label').val()) {
         cj("#label").focus();
         CRM.alert("Label for Trigger Rule can not be empty!", "Label Empty", "error");
