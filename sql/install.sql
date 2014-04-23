@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS `civicrm_action_rule` (
   `entity` varchar(255) NOT NULL,
   `action` varchar(255) NOT NULL,
   `params` text,
-  `process_contacts` TINYINT UNSIGNED NOT NULL DEFAULT  '1'
+  `process_contacts` TINYINT(4) UNSIGNED NOT NULL DEFAULT  '1'
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 ;
 
