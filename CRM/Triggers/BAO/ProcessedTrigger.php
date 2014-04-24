@@ -26,7 +26,7 @@ class CRM_Triggers_BAO_ProcessedTrigger extends CRM_Triggers_DAO_ProcessedTrigge
       $processed->date_processed = date('YmdHis');
       $processed->entity = $entityName;
       $processed->entity_id = $entity->id;
-      $processed->trigger_action_id = $rule_schedule->id;
+      $processed->rule_schedule_id = $rule_schedule->id;
       $processed->save();
     }
     

@@ -83,5 +83,5 @@ CREATE TABLE IF NOT EXISTS `civicrm_processed_trigger` (
   `entity` varchar(255) NOT NULL,
   `date_processed` datetime NOT NULL,
   PRIMARY KEY (`id`),
-  KEY `trigger_action` (`trigger_action_id`,`entity`)
+  KEY `trigger_action` (`rule_schedule_id`,`entity`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 ;
