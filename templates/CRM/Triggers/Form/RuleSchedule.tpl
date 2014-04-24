@@ -13,7 +13,7 @@
           <div class="crm-section">
             <div class="label">{$form.label.label}</div>
             {if $action eq 4}
-              <div class="content">{$form.label.value}</td>
+              <div class="content">{$form.label.value}</div>
             {else}
               <div class="content">{$form.label.html}</div>
             {/if}
@@ -47,6 +47,7 @@
             {else}
               <div class="content">{include file="CRM/common/jcalendar.tpl" elementName=start_date}</div>
             {/if}
+            <div class="clear"></div>
           </div>
           {* end date *}
           <div class="crm-section">
@@ -56,17 +57,20 @@
             {else}
               <div class="content">{include file="CRM/common/jcalendar.tpl" elementName=end_date}</div>
             {/if}
+            <div class="clear"></div>
           </div>
           {if $action neq 1}
             {* last run *}
             <div class="crm-section">
               <div class="label">{$form.last_run.label}</div>
               <div class="content">{$form.last_run.value|crmDate}</div>
+              <div class="clear"></div>
             </div>
             {* next run *}
             <div class="crm-section">
               <div class="label">{$form.next_run.label}</div>
               <div class="content">{$form.next_run.value|crmDate}</div>
+              <div class="clear"></div>
             </div>
           {/if}
           <div class="crm-section">
@@ -76,6 +80,7 @@
             {else}
               <div class="content">{$form.is_active.html}</div>
             {/if}
+            <div class="clear"></div>
           </div>
           
         </tbody>
