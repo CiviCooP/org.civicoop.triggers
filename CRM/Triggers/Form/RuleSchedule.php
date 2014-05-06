@@ -347,7 +347,8 @@ class CRM_Triggers_Form_RuleSchedule extends CRM_Core_Form {
       if ($compEndDate <= $compStartDate) {
           $errors['end_date'] = ts('End date has to be later than start date');
           return $errors;
-      }      
+      } 
     }
+    return TRUE;
   }
 }
