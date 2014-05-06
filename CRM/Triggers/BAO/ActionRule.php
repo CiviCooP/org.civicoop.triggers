@@ -146,101 +146,118 @@ class CRM_Triggers_BAO_ActionRule extends CRM_Triggers_DAO_ActionRule {
     $action->find(TRUE);
     return $action;
   }
-    /**
-     * Function to get values
-     * 
-     * @author Erik Hommel (CiviCooP) <erik.hommel@civicoop.org>
-     * @date 9 Apr 2014
-     * @param array $params name/value pairs with field names/values
-     * @return array $result found rows with data
-     * @access public
-     * @static
-     */
-    public static function getValues($params) {
-        $result = array();
-        $actionRule = new CRM_Triggers_BAO_ActionRule();
-        if (!empty($params)) {
-            $fields = self::fields();
-            foreach ($params as $paramKey => $paramValue) {
-                if (isset($fields[$paramKey])) {
-                    $actionRule->$paramKey = $paramValue;
-                }
-            }
+  /**
+   * Function to get values
+   * 
+   * @author Erik Hommel (CiviCooP) <erik.hommel@civicoop.org>
+   * @date 9 Apr 2014
+   * @param array $params name/value pairs with field names/values
+   * @return array $result found rows with data
+   * @access public
+   * @static
+   */
+  public static function getValues($params) {
+    $result = array();
+    $actionRule = new CRM_Triggers_BAO_ActionRule();
+    if (!empty($params)) {
+      $fields = self::fields();
+      foreach ($params as $paramKey => $paramValue) {
+        if (isset($fields[$paramKey])) {
+          $actionRule->$paramKey = $paramValue;
         }
-        $actionRule->find();
-        while ($actionRule->fetch()) {
-            self::storeValues($actionRule, $row);
-            $result[$row['id']] = $row;
-        }
-        return $result;
+      }
     }
-    /**
-     * Function to get single action with action_rule_id
-     * 
-     * @author Erik Hommel (CiviCooP) <erik.hommel@civicoop.org>
-     * @date 9 Apr 2014
-     * @param int $actionRuleId
-     * @return array $result found row with data
-     * @access public
-     * @static
-     */
-    public static function getByActionRuleId($actionRuleId) {
-        $result = array();
-        if (empty($actionRuleId)) {
-            return $result;
-        }
-        $actionRule = new CRM_Triggers_BAO_ActionRule();
-        $actionRule->id = $actionRuleId;
-        $actionRule->find(true);
-        self::storeValues($actionRule, $result);
-        return $result;
+    $actionRule->find();
+    while ($actionRule->fetch()) {
+      self::storeValues($actionRule, $row);
+      $result[$row['id']] = $row;
     }
-    /**
-     * Function to add or update action rule
-     * 
-     * @author Erik Hommel (CiviCooP) <erik.hommel@civicoop.org>
-     * @date 9 Apr 2014
-     * @param array $params 
-     * @return array $result
-     * @access public
-     * @static
-     */
-    public static function add($params) {
-        $result = array();
-        if (empty($params)) {
-            CRM_Core_Error::fatal('Params can not be empty when adding or updating an ActionRule');
-        }
-        $actionRule = new CRM_Triggers_BAO_ActionRule();
-        $fields = self::fields();
-        foreach ($params as $paramKey => $paramValue) {
-            if (isset($fields[$paramKey])) {
-                $actionRule->$paramKey = $paramValue;
-            }
-        }
-        $actionRule->save();
-        self::storeValues($actionRule, $result);
-        return $result;
+    return $result;
+  }
+  /**
+   * Function to get single action with action_rule_id
+   * 
+   * @author Erik Hommel (CiviCooP) <erik.hommel@civicoop.org>
+   * @date 9 Apr 2014
+   * @param int $actionRuleId
+   * @return array $result found row with data
+   * @access public
+   * @static
+   */
+  public static function getByActionRuleId($actionRuleId) {
+    $result = array();
+    if (empty($actionRuleId)) {
+      return $result;
     }
-    /**
-     * Function to delete action rule
-     * 
-     * @author Erik Hommel (CiviCooP) <erik.hommel@civicoop.org>
-     * @date 9 Apr 2014
-     * @param int $actionRuleId 
-     * @return boolean
-     * @access public
-     * @static
-     */
-    public static function deleteById($actionRuleId) {
-        if (empty($actionRuleId)) {
-            throw new Exception('ActionRuleId can not be empty when attempting to delete one');
-        }
-        $actionRule = new CRM_Triggers_BAO_ActionRule();
-        $actionRule->id = $actionRuleId;
-        $actionRule->delete();
-        return TRUE;
+    $actionRule = new CRM_Triggers_BAO_ActionRule();
+    $actionRule->id = $actionRuleId;
+    $actionRule->find(true);
+    self::storeValues($actionRule, $result);
+    return $result;
+  }
+  /**
+   * Function to add or update action rule
+   * 
+   * @author Erik Hommel (CiviCooP) <erik.hommel@civicoop.org>
+   * @date 9 Apr 2014
+   * @param array $params 
+   * @return array $result
+   * @access public
+   * @static
+   */
+  public static function add($params) {
+    $result = array();
+    if (empty($params)) {
+      CRM_Core_Error::fatal('Params can not be empty when adding or updating an ActionRule');
     }
-  
+    $actionRule = new CRM_Triggers_BAO_ActionRule();
+    $fields = self::fields();
+    foreach ($params as $paramKey => $paramValue) {
+      if (isset($fields[$paramKey])) {
+        $actionRule->$paramKey = $paramValue;
+      }
+    }
+    $actionRule->save();
+    self::storeValues($actionRule, $result);
+    return $result;
+  }
+  /**
+   * Function to delete action rule
+   * 
+   * @author Erik Hommel (CiviCooP) <erik.hommel@civicoop.org>
+   * @date 9 Apr 2014
+   * @param int $actionRuleId 
+   * @return boolean
+   * @access public
+   * @static
+   */
+  public static function deleteById($actionRuleId) {
+    if (empty($actionRuleId)) {
+      throw new Exception('ActionRuleId can not be empty when attempting to delete one');
+    }
+    $actionRule = new CRM_Triggers_BAO_ActionRule();
+    $actionRule->id = $actionRuleId;
+    $actionRule->delete();
+    return TRUE;
+  }
+  /**
+   * Function to check if there is an ActionRule with label
+   * 
+   * @author Erik Hommel (CiviCooP) <erik.hommel@civicoop.org>
+   * @date 6 May 2014
+   * @param string $label
+   * @return boolean
+   * @access public
+   * @static
+   */
+  public static function checkLabelExists($label) {
+    $actionRules = self::getValues(array('label' => $label));
+    if (empty($actionRules)) {
+      return FALSE;
+    } else {
+      return TRUE;
+    }
+  }  
 }
 
 
