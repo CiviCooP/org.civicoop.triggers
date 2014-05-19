@@ -94,7 +94,7 @@ class CRM_Triggers_Utils {
     
     $class = get_class($objRef);
     $fields = $class::fields();
-    $keyFields = $class::fieldKeys();
+		$keyFields = call_user_func($class.'::fieldKeys()');
     
     $contact_ids = array();
     if ($objRef instanceof CRM_Activity_DAO_Activity) {
@@ -102,7 +102,10 @@ class CRM_Triggers_Utils {
       $contact_ids = CRM_Activity_BAO_ActivityTarget::retrieveTargetIdsByActivityId($objRef->id);
     } elseif (isset($fields['contact_id']) || isset($keyFields['contact_id'])) {
       $contact_ids = array($objRef->contact_id);
-    }
+    } elseif (isset($fields['contribution_contact_id'])) {
+			//fix issue with Contribution dao which doesn't have implemented the fieldKeys method (civicrm < 4.4)
+			$contact_ids = array($objRef->contact_id);
+		}
     
     $contacts = array();
     foreach($contact_ids as $contact_id) {
