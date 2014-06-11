@@ -27,6 +27,9 @@ class CRM_Triggers_Utils_JoinTrigger {
     if (method_exists($dao_classes, 'getReferenceColumns')) {
       $references = $trigger_dao_class::getReferenceColumns();
     } else {
+      //not in every version of civicrm the reference columns are defined.
+      //so we have to add them manually.
+      //first check if a contact_id field exist. If so add a ref to the contact object
       $fields = $trigger_dao_class::fields();
       $keyFields = $trigger_dao_class::fieldKeys();
       if (isset($fields['contact_id']) || isset($keyFields['contact_id'])) {
