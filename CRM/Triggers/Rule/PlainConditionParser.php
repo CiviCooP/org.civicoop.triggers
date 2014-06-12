@@ -20,9 +20,15 @@ class CRM_Triggers_Rule_PlainConditionParser extends CRM_Triggers_Rule_BaseCondi
         throw new CRM_Triggers_Exception_InvalidCondition("Invalid field '".$this->trigger_rule_condition->field_name."'");
       }
     
-      $strCond = "".$sqlFieldName."";
-      $strCond .= " ".$this->trigger_rule_condition->operation." ";
-      $strCond .= $this->escapeValue($this->trigger_rule_condition->value);
+      if ($this->trigger_rule_condition->operation == "IS NOT EMPTY") {
+        $strCond = "(".$sqlFieldName." IS NOT NULL OR ".$sqlFieldName ." != '')";
+      } elseif ($this->trigger_rule_condition->operation == "IS EMPTY") {
+        $strCond = "(".$sqlFieldName." IS NULL OR ".$sqlFieldName ." = '')";
+      } else {
+        $strCond = "".$sqlFieldName."";
+        $strCond .= " ".$this->trigger_rule_condition->operation." ";
+        $strCond .= $this->escapeValue($this->trigger_rule_condition->value);
+      }
       
       $cond = new CRM_Triggers_QueryBuilder_Condition($strCond);
       $where->addCond($cond);  
