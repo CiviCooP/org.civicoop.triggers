@@ -22,7 +22,7 @@ class CRM_Triggers_Utils_EntityReference {
     $this->refTypeColumn = $refTypeColumn;
   }
   
-  protected static function convertReferences($references) {
+  public static function convertReferences($references) {
     $return = array();
     foreach($references as $ref) {
       $return[] = new CRM_Triggers_Utils_EntityReference($ref->getReferenceTable(), $ref->getReferenceKey(), $ref->getTargetTable(), $ref->getTargetKey(), $ref->getTypeColumn());
