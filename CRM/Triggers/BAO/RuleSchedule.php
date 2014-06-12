@@ -115,9 +115,11 @@ class CRM_Triggers_BAO_RuleSchedule extends CRM_Triggers_DAO_RuleSchedule {
     $daoClass = $rule_schedule_trigger->getTriggerRule()->getEntityDAOClass();
     $joinCondition = CRM_Triggers_Utils_JoinTrigger::createJoinCondition($this->getProcessedDAOClasses(), $daoClass);
     
-    $table = $daoClass::getTableName();
-    $joinStatement = " LEFT JOIN `".$table."` ON (".$joinCondition->toSqlCondition().")";
-    $builder->addJoin($joinStatement, $table);    
+    if ($joinCondition) {
+      $table = $daoClass::getTableName();
+      $joinStatement = " LEFT JOIN `".$table."` ON (".$joinCondition->toSqlCondition().")";
+      $builder->addJoin($joinStatement, $table);    
+    }
   }
   
   /** 

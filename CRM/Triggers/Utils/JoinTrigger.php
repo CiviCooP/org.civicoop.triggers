@@ -32,7 +32,9 @@ class CRM_Triggers_Utils_JoinTrigger {
       //first check if a contact_id field exist. If so add a ref to the contact object
       $fields = $trigger_dao_class::fields();
       $keyFields = $trigger_dao_class::fieldKeys();
-      if (isset($fields['contact_id']) || isset($keyFields['contact_id'])) {
+      if (isset($fields['contribution_contact_id'])) {
+        $references = array(new CRM_Core_EntityReference($trigger_dao_class::getTableName() , 'contact_id', 'civicrm_contact', 'id'));
+      } elseif (isset($fields['contact_id']) || isset($keyFields['contact_id'])) {
         $references = array(new CRM_Core_EntityReference($trigger_dao_class::getTableName() , 'contact_id', 'civicrm_contact', 'id'));
       }
     }    
@@ -42,7 +44,7 @@ class CRM_Triggers_Utils_JoinTrigger {
         if ($ref->getTargetTable() == $dao_class::getTableName()) {
           return new CRM_Triggers_QueryBuilder_Condition(
             "`".$ref->getTargetTable()."`.`".$ref->getTargetKey() . 
-            "` = `".$ref->getRefernceTable()."`.`".$ref->getReferenceKey()."`"
+            "` = `".$ref->getReferenceTable()."`.`".$ref->getReferenceKey()."`"
           );
         }
       }

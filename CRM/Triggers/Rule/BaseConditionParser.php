@@ -40,6 +40,26 @@ abstract class CRM_Triggers_Rule_BaseConditionParser {
     return $sqlFieldName;
   }
   
+  protected function getSqlFieldAlias($field_name, CRM_Triggers_QueryBuilder $builder) {
+    $trigger = CRM_Triggers_BAO_TriggerRule::getDaoByTriggerRuleId($this->trigger_rule_condition->trigger_rule_id);
+    $entityDAO = $trigger->getEntityDAO();
+    $entityDAOClass = $trigger->getEntityDAOClass();
+    
+    //check if field exist in DAO    
+    $sqlFieldName = false;
+    $field = CRM_Triggers_Utils::getFieldFromDao($entityDAO, $field_name);
+    if ($field !== false) {
+      $sqlFieldName = $this->parseField($field, $entityDAOClass::getTableName(), $builder);
+      if ($sqlFieldName) {
+        //replace the dors in underscore and remove the `
+        $sqlFieldName = str_replace(".", "_", $sqlFieldName);
+        $sqlFieldName = str_replace("`", "", $sqlFieldName);
+      }
+    }
+    
+    return $sqlFieldName;
+  }
+  
   /**
    * Escapes the value based on the special processing value
    * 

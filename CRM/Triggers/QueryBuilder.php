@@ -18,7 +18,7 @@ class CRM_Triggers_QueryBuilder {
    *
    * @var subcondition (CRM_Triggers_QueryBuilder_Subcondition)
    */
-  protected $having = array();
+  protected $having;
   
   protected $groupBys = array();
   
@@ -37,7 +37,7 @@ class CRM_Triggers_QueryBuilder {
   }
   
   public function addGroupBy($groupBy) {
-    $this->groupBys = $groupBy;
+    $this->groupBys[] = $groupBy;
   }
   
   public function addJoin($join, $key) {
