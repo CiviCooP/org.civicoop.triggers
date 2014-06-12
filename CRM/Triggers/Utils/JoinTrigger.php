@@ -24,14 +24,17 @@ class CRM_Triggers_Utils_JoinTrigger {
    */
   public static function createJoinCondition($dao_classes, $trigger_dao_class) {
     $references = array();
-    if (method_exists($dao_classes, 'getReferenceColumns')) {
+    if (method_exists($trigger_dao_class, 'getReferenceColumns')) {
       $references = $trigger_dao_class::getReferenceColumns();
     } else {
       //not in every version of civicrm the reference columns are defined.
       //so we have to add them manually.
       //first check if a contact_id field exist. If so add a ref to the contact object
       $fields = $trigger_dao_class::fields();
-      $keyFields = $trigger_dao_class::fieldKeys();
+      $keyFields = array();
+      if (method_exists($trigger_dao_class, 'fieldKeys')) {
+        $keyFields = $trigger_dao_class::fieldKeys();
+      }
       if (isset($fields['contribution_contact_id'])) {
         $references = array(new CRM_Core_EntityReference($trigger_dao_class::getTableName() , 'contact_id', 'civicrm_contact', 'id'));
       } elseif (isset($fields['contact_id']) || isset($keyFields['contact_id'])) {
