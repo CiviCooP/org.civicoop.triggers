@@ -247,4 +247,22 @@ class CRM_Triggers_BAO_RuleSchedule extends CRM_Triggers_DAO_RuleSchedule {
     self::storeValues($ruleSchedule, $result);
     return $result;
   }
+  /**
+   * Function to check if there is a ScheduleRule with label
+   * 
+   * @author Erik Hommel (CiviCooP) <erik.hommel@civicoop.org>
+   * @date 6 May 2014
+   * @param string $label
+   * @return boolean
+   * @access public
+   * @static
+   */
+  public static function checkLabelExists($label) {
+    $ruleSchedule = self::getValues(array('label' => $label));
+    if (empty($ruleSchedule)) {
+      return FALSE;
+    } else {
+      return TRUE;
+    }
+  }  
 }

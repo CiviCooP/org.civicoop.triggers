@@ -103,10 +103,7 @@ class CRM_Triggers_Form_RuleSchedule extends CRM_Core_Form {
     $this->addDate('last_run', ts('Date Last Run'), false);
     $this->addDate('next_run', ts('Date Next Run'), false);
     $this->add('text', 'is_active', ts('Enabled?', array('readonly' => 'readonly', false)));
-    $this->addButtons(array(array(
-      'type' => 'cancel',
-      'name' => ts('Done'),
-      'isDefault' => true)));
+    $this->addButtons(array(array('type' => 'cancel', 'name' => ts('Done'), 'isDefault' => true)));
   }
   /*
    * set form elements for add action
@@ -318,6 +315,40 @@ class CRM_Triggers_Form_RuleSchedule extends CRM_Core_Form {
     }
     return $scheduledTriggerRow;
   }
+  /**
+   * Function to add validation rules
+   */
+  function addRules() {
+    if ($this->_action == CRM_Core_Action::ADD) {
+      $this->addFormRule(array('CRM_Triggers_Form_RuleSchedule', 'validateLabel'));
+    }
+    if ($this->_action == CRM_Core_Action::ADD || $this->_action == CRM_Core_Action::UPDATE) {
+      $this->addFormRule(array('CRM_Triggers_Form_RuleSchedule', 'validateDates'));
+    }
+  }
+  /**
+   * Function to validate label
+   */
+  static function validateLabel($fields) {
+    if (CRM_Triggers_BAO_RuleSchedule::checkLabelExists($fields['label']) == TRUE) {
+      $errors['label'] = ts('There is already a Schedule Rule with label '.$fields['label']);
+      return $errors;
+    } else {
+      return TRUE;
+    }
+  }
+  /**
+   * Function to validate dates
+   */
+  static function validateDates($fields) {
+    if (!empty($fields['end_date'])) {
+      $compEndDate = date('Ymd', strtotime($fields['end_date']));
+      $compStartDate = date('Ymd', strtotime($fields['start_date']));
+      if ($compEndDate <= $compStartDate) {
+          $errors['end_date'] = ts('End date has to be later than start date');
+          return $errors;
+      } 
+    }
+    return TRUE;
+  }
 }
-
-

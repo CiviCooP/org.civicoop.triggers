@@ -144,5 +144,23 @@ class CRM_Triggers_BAO_TriggerRule extends CRM_Triggers_DAO_TriggerRule {
     }
     return self::$entity_dao_class_name[$this->id];
   }
+  /**
+   * Function to check if there is a TriggerRule with label
+   * 
+   * @author Erik Hommel (CiviCooP) <erik.hommel@civicoop.org>
+   * @date 6 May 2014
+   * @param string $label
+   * @return boolean
+   * @access public
+   * @static
+   */
+  public static function checkLabelExists($label) {
+    $triggerRules = self::getValues(array('label' => $label));
+    if (empty($triggerRules)) {
+      return FALSE;
+    } else {
+      return TRUE;
+    }
+  }  
 
 }

@@ -18,10 +18,11 @@ require_once 'CRM/Core/Form.php';
  * @see http://wiki.civicrm.org/confluence/display/CRMDOC43/QuickForm+Reference
  */
 class CRM_Triggers_Form_ActionRule extends CRM_Core_Form {
-    
-    protected $_actionRuleEntities = array();
-    protected $_actionRuleActions = array();
-    
+  protected $_actionRuleEntities = array();
+  protected $_actionRuleActions = array();
+  /**
+   * Function to build the form
+   */  
   function buildQuickForm() {
     $this->preProcess();
     /*
@@ -35,7 +36,9 @@ class CRM_Triggers_Form_ActionRule extends CRM_Core_Form {
     $this->assign('elementNames', $this->getRenderableElementNames());
     parent::buildQuickForm();
   }
-
+  /**
+   * Function to process the form
+   */
   function postProcess() {
     $values = $this->exportValues();
     if ($this->_action == CRM_Core_Action::UPDATE) {
@@ -51,7 +54,6 @@ class CRM_Triggers_Form_ActionRule extends CRM_Core_Form {
     $session->setStatus('Action Rule Saved', 'Saved', 'success');
     parent::postProcess();
   }
-
   /**
    * Get the fields/elements defined in this form.
    *
@@ -118,6 +120,9 @@ class CRM_Triggers_Form_ActionRule extends CRM_Core_Form {
     }
     CRM_Utils_System::setTitle(ts($pageTitle));
   }
+  /**
+   * Function to set default values
+   */
   function setDefaultValues() {
     $defaults = array();
     if (isset($this->_id)) {
@@ -151,6 +156,9 @@ class CRM_Triggers_Form_ActionRule extends CRM_Core_Form {
     return $defaults;
 
   }
+  /**
+   * Function to set the form elements
+   */
   function setFormElements() {
     if ($this->_action == CRM_Core_Action::VIEW) {
       $this->setViewElements();
@@ -158,6 +166,9 @@ class CRM_Triggers_Form_ActionRule extends CRM_Core_Form {
       $this->setUpdateAddElements();
     }
   }
+  /**
+   * Form elements for View mode
+   */
   function setViewElements() {
       $this->add(
         'text',
@@ -198,13 +209,11 @@ class CRM_Triggers_Form_ActionRule extends CRM_Core_Form {
         ),
         false
       );
-      $this->addButtons(array(
-        array(
-          'type' => 'cancel',
-          'name' => ts('Done'),
-          'isDefault' => true
-      )));
+    $this->addButtons(array(array('type' => 'cancel', 'name' => ts('Done'), 'isDefault' => true)));
   }
+  /**
+   * Function to set form elements for Add/Update mode
+   */
   function setUpdateAddElements() {
       $this->add(
         'text',
@@ -252,5 +261,24 @@ class CRM_Triggers_Form_ActionRule extends CRM_Core_Form {
         ),
         )
     );
+  }
+  /**
+   * Function to add validation rules
+   */
+  function addRules() {
+    if ($this->_action == CRM_Core_Action::ADD) {
+      $this->addFormRule(array('CRM_Triggers_Form_ActionRule', 'validateLabel'));
+    }
+  }
+  /**
+   * Function to validate label
+   */
+  static function validateLabel($fields) {
+    if (CRM_Triggers_BAO_ActionRule::checkLabelExists($fields['label']) == TRUE) {
+      $errors['label'] = ts('There is already an ActionRule with label '.$fields['label']);
+      return $errors;
+    } else {
+      return TRUE;
+    }
   }
 }
