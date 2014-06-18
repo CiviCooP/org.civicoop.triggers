@@ -169,15 +169,20 @@ class CRM_Triggers_BAO_RuleSchedule extends CRM_Triggers_DAO_RuleSchedule {
    * Reschedule this trigger/action combination and set last run date
    */
   public function reschedule() {
-    $this->last_run = date('YmdHis');
+    
+    $dao = new CRM_Triggers_BAO_RuleSchedule();
+    $dao->id = $this->id;
+    if ($dao->find(TRUE)) {
+      $dao->last_run = date('YmdHis');
 
-    if (strlen($this->schedule)) {
-      $date = new DateTime();
-      $date->modify($this->schedule);
-      $this->next_run = $date->format('YmdHis');
+      if (strlen($dao->schedule)) {
+        $date = new DateTime();
+        $date->modify($this->schedule);
+        $dao->next_run = $date->format('YmdHis');
+      }
+
+      $dao->save();
     }
-
-    $this->save();
   }
   /**
    * Function to add or update rule schedule
