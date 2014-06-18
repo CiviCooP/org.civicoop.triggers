@@ -22,6 +22,7 @@ class CRM_Triggers_BAO_RuleSchedule extends CRM_Triggers_DAO_RuleSchedule {
     $rule_schedule->whereAdd('(start_date IS NULL OR start_date <= NOW())');
     $rule_schedule->whereAdd('(end_date IS NULL OR end_date >= NOW())');
     $rule_schedule->whereAdd('(next_run <= NOW())');
+    $rule_schedule->orderBy("`next_run` ASC");
 
     $rule_schedule->find($fetchFirst);
 
