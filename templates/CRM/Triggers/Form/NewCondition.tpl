@@ -12,6 +12,7 @@
                 <td>{$form.field_name.html}</td>
                 <td>{$form.operation.html}</td>
                 <td>{$form.value.html}</td>
+                <td>{$form.special_processing.html}</td>
                 <td>{$form.aggregate_function.html}</td>
                 <td>{$form.grouping_field.html}</td>
                 <td>

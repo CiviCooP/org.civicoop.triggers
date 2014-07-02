@@ -16,6 +16,7 @@
                 <td>{$row.field_name}</td>
                 <td>{$row.operation}</td>
                 <td>{$row.value}</td>
+                <td>{if $row.special_processing}{ts}Yes{/ts}{else}{ts}No{/ts}{/if}</td>
                 <td>{$row.aggregate_function}</td>
                 <td>{$row.grouping_field}</td>
                 <td>

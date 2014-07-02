@@ -57,6 +57,10 @@ class CRM_Triggers_DAO_TriggerRuleCondition extends CRM_Core_DAO {
           'maxlength' => 255,
           'size' => CRM_Utils_Type::HUGE,
         ) ,
+        'special_processing' => array(
+          'name' => 'special_processing',
+          'type' => CRM_Utils_Type::T_BOOLEAN,
+        ),
         'operation' => array(
           'name' => 'operation',
           'type' => CRM_Utils_Type::T_STRING,
@@ -97,6 +101,7 @@ class CRM_Triggers_DAO_TriggerRuleCondition extends CRM_Core_DAO {
         'trigger_rule_id' => 'trigger_rule_id',
         'field_name' => 'field_name',
         'operation' => 'operation',
+        'special_processing' => 'special_processing',
         'value' => 'value',
         'aggregate_function' => 'aggregate_function',
         'grouping_field' => 'grouping_field',
