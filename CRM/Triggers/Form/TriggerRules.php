@@ -163,7 +163,7 @@ class CRM_Triggers_Form_TriggerRules extends CRM_Core_Form {
         $saveConditionParams['field_name'] = CRM_Utils_Array::value($values['field_name'], $this->_entityFields);
         $saveConditionParams['operation'] = CRM_Utils_Array::value($values['operation'], $this->_conditionOperations);
         $saveConditionParams['value'] = $values['value'];
-        $saveConditionParams['special_processing'] = $values['special_processing'];
+        $saveConditionParams['special_processing'] = isset($values['special_processing']) && $values['special_processing'] ? '1' : '0';
         $saveConditionParams['aggregate_function'] = $values['aggregate_function'];
         $saveConditionParams['grouping_field'] = $values['grouping_field'];                
         CRM_Triggers_BAO_TriggerRuleCondition::add($saveConditionParams);
