@@ -29,12 +29,13 @@ abstract class CRM_Triggers_Rule_BaseConditionParser {
     $trigger = CRM_Triggers_BAO_TriggerRule::getDaoByTriggerRuleId($this->trigger_rule_condition->trigger_rule_id);
     $entityDAO = $trigger->getEntityDAO();
     $entityDAOClass = $trigger->getEntityDAOClass();
+    $table_alias = $trigger->getTableAlias();
     
     //check if field exist in DAO    
     $sqlFieldName = false;
     $field = CRM_Triggers_Utils::getFieldFromDao($entityDAO, $field_name);
     if ($field !== false) {
-      $sqlFieldName = $this->parseField($field, $entityDAOClass::getTableName(), $builder);
+      $sqlFieldName = $this->parseField($field, $table_alias, $builder);
     }
     
     return $sqlFieldName;
@@ -44,12 +45,13 @@ abstract class CRM_Triggers_Rule_BaseConditionParser {
     $trigger = CRM_Triggers_BAO_TriggerRule::getDaoByTriggerRuleId($this->trigger_rule_condition->trigger_rule_id);
     $entityDAO = $trigger->getEntityDAO();
     $entityDAOClass = $trigger->getEntityDAOClass();
+    $table_alias = $trigger->getTableAlias();
     
     //check if field exist in DAO    
     $sqlFieldName = false;
     $field = CRM_Triggers_Utils::getFieldFromDao($entityDAO, $field_name);
     if ($field !== false) {
-      $sqlFieldName = $this->parseField($field, $entityDAOClass::getTableName(), $builder);
+      $sqlFieldName = $this->parseField($field, $table_alias, $builder);
       if ($sqlFieldName) {
         //replace the dors in underscore and remove the `
         $sqlFieldName = str_replace(".", "_", $sqlFieldName);

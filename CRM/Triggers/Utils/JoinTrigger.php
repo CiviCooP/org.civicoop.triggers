@@ -22,26 +22,26 @@ class CRM_Triggers_Utils_JoinTrigger {
    * @param string $trigger_dao_class the class name of the current dao
    * @return boolean|\CRM_Triggers_QueryBuilder_Condition
    */
-  public static function createJoinCondition($dao_classes, $trigger_dao_class) {
+  public static function createJoinCondition($dao_classes, $trigger_dao_class, $table_alias) {
     $references = CRM_Triggers_Utils_JoinTrigger::getDaoReferenceColumns($trigger_dao_class);    
     foreach($references as $ref) {
-      foreach($dao_classes as $dao_class) {
+      foreach($dao_classes as $alias => $dao_class) {
         if ($ref->getTargetTable() == $dao_class::getTableName()) {
           return new CRM_Triggers_QueryBuilder_Condition(
-            "`".$ref->getTargetTable()."`.`".$ref->getTargetKey() . 
-            "` = `".$ref->getReferenceTable()."`.`".$ref->getReferenceKey()."`"
+            "`".$alias."`.`".$ref->getTargetKey() . 
+            "` = `".$table_alias."`.`".$ref->getReferenceKey()."`"
           );
         }
       }
     }
     
-    foreach($dao_classes as $dao_class) {
+    foreach($dao_classes as $alias => $dao_class) {
       $references = CRM_Triggers_Utils_JoinTrigger::getDaoReferenceColumns($dao_class);
       foreach($references as $ref) {
         if ($ref->getTargetTable() == $trigger_dao_class::getTableName()) {
           return new CRM_Triggers_QueryBuilder_Condition(
-            "`".$ref->getTargetTable()."`.`".$ref->getTargetKey() . 
-            "` = `".$ref->getReferenceTable()."`.`".$ref->getReferenceKey()."`"
+            "`".$table_alias."`.`".$ref->getTargetKey() . 
+            "` = `".$alias."`.`".$ref->getReferenceKey()."`"
           );
         }
       }
@@ -49,9 +49,9 @@ class CRM_Triggers_Utils_JoinTrigger {
 
 		//create a join on contact_id if both classes have a link to contact
 		if (CRM_Triggers_Utils_JoinTrigger::hasDaoALinkToContact($trigger_dao_class)) {
-			foreach($dao_classes as $dao_class) {
+			foreach($dao_classes as $alias => $dao_class) {
 				if (CRM_Triggers_Utils_JoinTrigger::hasDaoALinkToContact($dao_class)) {
-						return new CRM_Triggers_QueryBuilder_Condition("`".$trigger_dao_class::getTableName()."`.`contact_id` = `".$dao_class::getTableName()."`.`contact_id`");
+						return new CRM_Triggers_QueryBuilder_Condition("`".$table_alias."`.`contact_id` = `".$alias."`.`contact_id`");
 				}
 			}
 		}

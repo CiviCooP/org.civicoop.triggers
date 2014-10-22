@@ -138,7 +138,7 @@ class CRM_Triggers_BAO_TriggerRule extends CRM_Triggers_DAO_TriggerRule {
     if (!isset(self::$entity_dao_class_name[$this->id])) {
       $dao = CRM_Core_DAO_AllCoreTables::getFullName($this->entity);
       if ($dao == NULL) {
-        throw new CRM_Triggers_Exception_DAO_Not_Found("Entity " . $this->entity . " has no DAO");
+        throw new CRM_Triggers_Exception_DAONotFound("Entity " . $this->entity . " has no DAO");
       }
       self::$entity_dao_class_name[$this->id] = $dao;
     }
@@ -161,6 +161,13 @@ class CRM_Triggers_BAO_TriggerRule extends CRM_Triggers_DAO_TriggerRule {
     } else {
       return TRUE;
     }
-  }  
+  }
+  
+  public function getTableAlias() {
+    $entityDAOClass = $this->getEntityDAOClass();
+    $table = $entityDAOClass::getTableName();
+    $table_alias = $table . '_'.$this->id;
+    return $table_alias;
+  }
 
 }

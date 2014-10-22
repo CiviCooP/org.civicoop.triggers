@@ -97,23 +97,15 @@ class CRM_Triggers_BAO_ActionRule extends CRM_Triggers_DAO_ActionRule {
     foreach($params as $key => $val) {  
       //check if the val is encapsulated into brackets { }      
       //e.g. {contribution.status_id}      
-         
       $matches = array();      
       if (!isset($return[$key]) && preg_match("/{(.*)\.(.*)}/", $val, $matches)) {
         //value looks like {entity.field}
         //so we split this and we check if objRef is of entty and the field exist on objectref
-        $entityName = CRM_Triggers_Utils::camelCaseEntity($matches[1]);
+        $entity = $matches[1];
         $fieldName = $matches[2];
         
-        $entityType = CRM_Core_DAO_AllCoreTables::getFullName($entityName);
-        if ($entityType == NULL) {
-          throw new CRM_Triggers_Exception_DAO_Not_Found("Entity ".$entityName." has no DAO");
-        }
-        //check if objRef is an instanceof $entityType
-        if (isset($objects[$entityName]) && $objects[$entityName] instanceof $entityType) {      
-          if (isset($fields[$entityName]) && isset($fields[$entityName][$fieldName])) {
-            $return[$key] = $objects[$entityName]->$fieldName;
-          }
+        if (isset($objects[$entity]) && isset($objects[$entity]->$fieldName)) {
+          $return[$key] = $objects[$entity]->$fieldName;
         }
       } 
       

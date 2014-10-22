@@ -54,19 +54,29 @@ class CRM_Triggers_BAO_RuleSchedule extends CRM_Triggers_DAO_RuleSchedule {
     if (!isset(self::$processedTriggers[$this->id])) {
       return;
     }
+    $entity_count = array();
     $entities = array();
     $fields = $entityQuery->toArray();
     foreach(self::$processedTriggers[$this->id] as $trigger) {
       $dao_class = $trigger->getEntityDAOClass();
       $dao = new $dao_class();
-      $table = $dao_class::getTableName();
+      $table = $trigger->getTableAlias();
       foreach($fields as $key => $val) {
         if (strpos($key, $table."_")===0) {
           $fieldName = str_replace($table."_", "", $key);
           $dao->$fieldName = $val;
         }
       }
-      $entities[$trigger->entity] = $dao;
+      if (isset($entity_count[$trigger->entity])) {
+        $entity_count[$trigger->entity]++;
+        $count = $entity_count[$trigger->entity];
+        $entities[$trigger->entity.''.$count] = $dao;
+      } else {
+        $entities[$trigger->entity] = $dao;
+        $entity_count[$trigger->entity] = 1;
+        $count = $entity_count[$trigger->entity];
+        $entities[$trigger->entity.''.$count] = $dao;
+      }
     }
     return $entities;
   }
@@ -114,11 +124,12 @@ class CRM_Triggers_BAO_RuleSchedule extends CRM_Triggers_DAO_RuleSchedule {
    */
   protected function addJoinedTriggerToQueryBuilder(CRM_Triggers_BAO_RuleScheduleTrigger $rule_schedule_trigger, CRM_Triggers_QueryBuilder $builder) {
     $daoClass = $rule_schedule_trigger->getTriggerRule()->getEntityDAOClass();
-    $joinCondition = CRM_Triggers_Utils_JoinTrigger::createJoinCondition($this->getProcessedDAOClasses(), $daoClass);
+    $table_alias = $rule_schedule_trigger->getTriggerRule()->getTableAlias();
+    $joinCondition = CRM_Triggers_Utils_JoinTrigger::createJoinCondition($this->getProcessedDAOClasses(), $daoClass, $table_alias);
     
     if ($joinCondition) {
       $table = $daoClass::getTableName();
-      $joinStatement = " LEFT JOIN `".$table."` ON (".$joinCondition->toSqlCondition().")";
+      $joinStatement = " LEFT JOIN `".$table."` `".$table_alias."` ON (".$joinCondition->toSqlCondition().")";
       $builder->addJoin($joinStatement, $table);    
     }
   }
@@ -130,7 +141,7 @@ class CRM_Triggers_BAO_RuleSchedule extends CRM_Triggers_DAO_RuleSchedule {
     $return = array();
     if (isset(self::$processedTriggers[$this->id])) {
       foreach(self::$processedTriggers[$this->id] as $trigger) {
-        $return[] = $trigger->getEntityDAOClass();
+        $return[$trigger->getTableAlias()] = $trigger->getEntityDAOClass();
       }
     }
     return $return;

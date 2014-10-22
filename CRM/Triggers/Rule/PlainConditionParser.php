@@ -37,9 +37,10 @@ class CRM_Triggers_Rule_PlainConditionParser extends CRM_Triggers_Rule_BaseCondi
   public function addAlreadyProcessedCondition(CRM_Triggers_QueryBuilder_Subcondition $alreadyProcessedConditions, CRM_Triggers_BAO_RuleScheduleTrigger $rule_schedule_trigger) {
     $trigger = CRM_Triggers_BAO_TriggerRule::getDaoByTriggerRuleId($this->trigger_rule_condition->trigger_rule_id);
     $entityDAOClass = $trigger->getEntityDAOClass();
+    $table_alias = $trigger->getTableAlias();
     
     //add a join on civicrm_processed_trigger
-    $alreadyProcessedCond = new CRM_Triggers_QueryBuilder_Condition("`".$entityDAOClass::getTableName() ."`.`id` NOT IN ("
+    $alreadyProcessedCond = new CRM_Triggers_QueryBuilder_Condition("`".$table_alias ."`.`id` NOT IN ("
         . "SELECT `entity_id` FROM `civicrm_processed_trigger` "
         . "WHERE `entity` = ".$this->escapeValue($trigger->entity, true)." "
         . "AND `rule_schedule_id` = ".$this->escapeValue($rule_schedule_trigger->rule_schedule_id, true).")");
