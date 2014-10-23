@@ -55,7 +55,7 @@ class CRM_Triggers_Utils_JoinTrigger {
         foreach($references as $ref) {
           if ($ref->getTargetTable() == $trigger_ref->getTargetTable() && $ref->getTargetKey() == $trigger_ref->getTargetKey()) {
             return new CRM_Triggers_QueryBuilder_Condition(
-              "`".$table_alias."`.`".$ref->getReferenceKey() . 
+              "`".$table_alias."`.`".$trigger_ref->getReferenceKey() . 
               "` = `".$alias."`.`".$ref->getReferenceKey()."`"
             );
           }
