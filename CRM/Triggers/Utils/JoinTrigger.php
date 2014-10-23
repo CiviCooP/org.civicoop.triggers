@@ -23,7 +23,9 @@ class CRM_Triggers_Utils_JoinTrigger {
    * @return boolean|\CRM_Triggers_QueryBuilder_Condition
    */
   public static function createJoinCondition($dao_classes, $trigger_dao_class, $table_alias) {
+    $refs = array();
     $references = CRM_Triggers_Utils_JoinTrigger::getDaoReferenceColumns($trigger_dao_class);    
+    $refs[$trigger_dao_class] = $references;
     foreach($references as $ref) {
       foreach($dao_classes as $alias => $dao_class) {
         if ($ref->getTargetTable() == $dao_class::getTableName()) {
@@ -37,6 +39,7 @@ class CRM_Triggers_Utils_JoinTrigger {
     
     foreach($dao_classes as $alias => $dao_class) {
       $references = CRM_Triggers_Utils_JoinTrigger::getDaoReferenceColumns($dao_class);
+      $refs[$dao_class] = $references;
       foreach($references as $ref) {
         if ($ref->getTargetTable() == $trigger_dao_class::getTableName()) {
           return new CRM_Triggers_QueryBuilder_Condition(
@@ -55,7 +58,7 @@ class CRM_Triggers_Utils_JoinTrigger {
 				}
 			}
 		}
-    
+    var_dump($refs); exit();
     return false;
   }
   
