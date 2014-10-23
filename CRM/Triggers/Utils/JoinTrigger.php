@@ -69,6 +69,9 @@ class CRM_Triggers_Utils_JoinTrigger {
     $references = array();
     if (method_exists($dao_class, 'getReferenceColumns')) {
       $references = CRM_Triggers_Utils_EntityReference::convertReferences($dao_class::getReferenceColumns());
+    } elseif ($dao_class == 'CRM_Activity_DAO_ActivityTarget' || $dao_class == 'CRM_Activity_DAO_ActivityAssignment') {
+      $references[] = new CRM_Triggers_Utils_EntityReference($dao_class::getTableName() , 'contact_id', 'civicrm_contact', 'id');
+      $references[] = new CRM_Triggers_Utils_EntityReference($dao_class::getTableName() , 'activity_id', 'civicrm_activity', 'id');
     } else {
       //not in every version of civicrm the reference columns are defined.
       //so we have to add them manually.
