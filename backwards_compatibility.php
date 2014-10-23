@@ -1,6 +1,8 @@
 <?php
+$CRM_Core_EntityReference_exists = false;
+try { $CRM_Core_EntityReference_exists = class_exists('CRM_Core_EntityReference'); } catch (Exception $e) { ; }
 
-if (!class_exists('CRM_Core_EntityReference')) {
+if (!$CRM_Core_EntityReference_exists) {
 /**
  * Description of a one-way link between two entities
  *
