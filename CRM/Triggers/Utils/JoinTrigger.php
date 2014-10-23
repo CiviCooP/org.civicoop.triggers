@@ -47,7 +47,7 @@ class CRM_Triggers_Utils_JoinTrigger {
       }
     }
     
-    //check for linking entity
+    //check for linking entity e.g. group_contact.contact_id = activity_target.target_contact_id
     foreach($dao_classes as $alias => $dao_class) {
       $references = CRM_Triggers_Utils_JoinTrigger::getDaoReferenceColumns($dao_class);
       $trigger_references = CRM_Triggers_Utils_JoinTrigger::getDaoReferenceColumns($trigger_dao_class);
