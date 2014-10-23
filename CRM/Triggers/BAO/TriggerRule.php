@@ -136,7 +136,7 @@ class CRM_Triggers_BAO_TriggerRule extends CRM_Triggers_DAO_TriggerRule {
 
   public function getEntityDAOClass() {
     if (!isset(self::$entity_dao_class_name[$this->id])) {
-      $dao = CRM_Core_DAO_AllCoreTables::getFullName($this->entity);
+      $dao = CRM_Triggers_Utils_DaoClass::getDaoClassByFullName($this->entity);
       if ($dao == NULL) {
         throw new CRM_Triggers_Exception_DAONotFound("Entity " . $this->entity . " has no DAO");
       }
@@ -144,6 +144,8 @@ class CRM_Triggers_BAO_TriggerRule extends CRM_Triggers_DAO_TriggerRule {
     }
     return self::$entity_dao_class_name[$this->id];
   }
+  
+  
   /**
    * Function to check if there is a TriggerRule with label
    * 
