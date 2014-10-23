@@ -132,6 +132,7 @@ class CRM_Triggers_BAO_RuleSchedule extends CRM_Triggers_DAO_RuleSchedule {
       $joinStatement = " LEFT JOIN `".$table."` `".$table_alias."` ON (".$joinCondition->toSqlCondition().")";
       $builder->addJoin($joinStatement, $table);    
     }
+    var_dump($joinCondition); exit();
   }
   
   /** 
