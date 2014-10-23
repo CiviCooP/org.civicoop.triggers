@@ -71,7 +71,7 @@ class CRM_Triggers_Utils_JoinTrigger {
 				}
 			}
 		}
-
+var_dump($dao_classes); exit();
     return false;
   }
   
