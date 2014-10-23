@@ -1,7 +1,6 @@
 <?php
 
 require_once 'triggers.civix.php';
-require_once 'backwards_compatibility.php';
 
 /**
  * Implementation of hook_civicrm_config
