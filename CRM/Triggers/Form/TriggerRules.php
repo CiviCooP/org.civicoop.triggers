@@ -99,7 +99,7 @@ class CRM_Triggers_Form_TriggerRules extends CRM_Core_Form {
       $session->setStatus('Trigger Rule deleted', 'Delete', 'success');
       CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/triggerruleslist'));
     }
-    $validEntities = array('Activity', 'Contribution', 'GroupContact', 'Contact', 
+    $validEntities = array('Activity', 'ActivityContact',  'Contribution', 'GroupContact', 'Contact', 
       'Email', 'Phone', 'Address');
     sort($validEntities);
     $this->_entities = $validEntities;

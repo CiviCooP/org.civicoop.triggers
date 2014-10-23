@@ -15,6 +15,26 @@ class CRM_Triggers_BAO_RuleScheduleTrigger extends CRM_Triggers_DAO_RuleSchedule
   }
   
   /**
+   * Function to delete rule schedule
+   * 
+   * @author Erik Hommel (CiviCooP) <erik.hommel@civicoop.org>
+   * @date 11 Apr 2014
+   * @param int $ruleScheduTriggerleId 
+   * @return boolean
+   * @access public
+   * @static
+   */
+  public static function deleteById($ruleScheduleTriggerId) {
+    if (empty($ruleScheduleTriggerId)) {
+        throw new Exception('ruleScheduleTriggerId can not be empty when attempting to delete one');
+    }
+    $ruleScheduleTrigger = new CRM_Triggers_BAO_RuleScheduleTrigger();
+    $ruleScheduleTrigger->id = $ruleScheduleTriggerId;
+    $ruleScheduleTrigger->delete();
+    return TRUE;
+  }
+  
+  /**
    * Returns a new QueryBuilder object for this trigger
    * 
    * @return CRM_Triggers_QueryBuilder
