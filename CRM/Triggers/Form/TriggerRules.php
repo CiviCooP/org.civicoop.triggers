@@ -225,13 +225,28 @@ class CRM_Triggers_Form_TriggerRules extends CRM_Core_Form {
    */
   private function _listEntityFields() {
     if (isset($this->_entity) && !empty($this->_entity)) {
-      $daoEntity = CRM_Core_DAO_AllCoreTables::getFullName($this->_entity);
+      $daoEntity = $this->getDaoClassByFullName($this->_entity);
       $fields = $daoEntity::fields();
       foreach ($fields as $field) {
         $result[] = $field['name'];
       }
       return $result;
     }
+  }
+  
+  private function getDaoClassByFullName($fullName) {
+    $daoEntity = CRM_Core_DAO_AllCoreTables::getFullName($fullName);
+    if (empty($daoEntity)) {
+      switch($fullName) {
+        case 'ActivityTarget':
+          $daoEntity = 'CRM_Activity_DAO_ActivityTarget';
+          break;
+        case 'ActivityAssignment':
+          $daoEntity = 'CRM_Activity_DAO_ActivityTarget';
+          break;
+      }
+    }
+    return $daoEntity;
   }
   /**
    * Function to add validation rules
