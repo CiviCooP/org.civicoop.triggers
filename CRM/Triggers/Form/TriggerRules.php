@@ -242,7 +242,7 @@ class CRM_Triggers_Form_TriggerRules extends CRM_Core_Form {
           $daoEntity = 'CRM_Activity_DAO_ActivityTarget';
           break;
         case 'ActivityAssignment':
-          $daoEntity = 'CRM_Activity_DAO_ActivityTarget';
+          $daoEntity = 'CRM_Activity_DAO_ActivityAssignment';
           break;
       }
     }
