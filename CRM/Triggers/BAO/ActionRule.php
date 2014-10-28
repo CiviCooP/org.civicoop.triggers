@@ -82,9 +82,11 @@ class CRM_Triggers_BAO_ActionRule extends CRM_Triggers_DAO_ActionRule {
     }
     
     $fields = array();
+    $object_keys = array();
     foreach($objects as $entity => $obj) {
       $class = get_class($obj);
       $fields[$entity] = $class::fields();
+      $object_keys[strtolower($entity)] = $entity;
     }
     
     $hooks = CRM_Utils_Hook::singleton();
@@ -101,11 +103,15 @@ class CRM_Triggers_BAO_ActionRule extends CRM_Triggers_DAO_ActionRule {
       if (!isset($return[$key]) && preg_match("/{(.*)\.(.*)}/", $val, $matches)) {
         //value looks like {entity.field}
         //so we split this and we check if objRef is of entty and the field exist on objectref
-        $entity = $matches[1];
+        $entity = strtolower($matches[1]);
+        $entity_key = $matches[1];
+        if (isset($object_keys[$entity])) {
+          $entity_key = $object_keys[$entity];
+        }
         $fieldName = $matches[2];
         
-        if (isset($objects[$entity]) && isset($objects[$entity]->$fieldName)) {
-          $return[$key] = $objects[$entity]->$fieldName;
+        if (isset($objects[$entity_key]) && isset($objects[$entity_key]->$fieldName)) {
+          $return[$key] = $objects[$entity_key]->$fieldName;
         }
       } 
       
