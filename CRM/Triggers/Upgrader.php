@@ -144,7 +144,8 @@ class CRM_Triggers_Upgrader extends CRM_Triggers_Upgrader_Base {
     $tag_id = $this->getTagId($params['name']);
     
     if ($tag_id === false) {
-      civicrm_api3('Tag', 'create', $params);
+      $params['version'] = 3;
+      civicrm_api('Tag', 'create', $params);
     }
   }
   
@@ -155,32 +156,39 @@ class CRM_Triggers_Upgrader extends CRM_Triggers_Upgrader_Base {
     
     $activity_id = $this->getActivityTypeId($params['name']);
     if ($activity_id === false) {
-      $option_group = civicrm_api3('OptionGroup', 'getsingle', array('name' => 'activity_type'));
+      $option_group = civicrm_api('OptionGroup', 'getsingle', array('name' => 'activity_type', 'version' => 3));
+      if (isset($option_group['is_error']) && $option_group['is_error']) {
+        return;
+      }
       $params['option_group_id'] = $option_group['id'];
-      civicrm_api3('OptionValue', 'Create', $params); 
+      $params['version'] = 3;
+      civicrm_api('OptionValue', 'Create', $params); 
     }          
   }
   
   protected function getTagId($name) {
-    try {
-      $params['name'] = $name;
-      $tag = civicrm_api3('Tag', 'getsingle', $params);
-      return $tag['id'];
-    } catch (Exception $e) {
+    $params['name'] = $name;
+    $params['version'] = 3;
+    $tag = civicrm_api('Tag', 'getsingle', $params);
+    if (isset($tag['is_error']) && $tag['is_error']) {
       return false;
     }
+    return $tag['id'];
   }
   
   protected function getActivityTypeId($name) {
-    try {
-      $option_group = civicrm_api3('OptionGroup', 'getsingle', array('name' => 'activity_type'));
-      $params['option_group_id'] = $option_group['id'];
-      $params['name'] = $name;
-      $activity_type = civicrm_api3('OptionValue', 'getsingle', $params);
-      return $activity_type['id'];
-    } catch (Exception $e) {
+    $option_group = civicrm_api('OptionGroup', 'getsingle', array('name' => 'activity_type', 'version' => 3));
+    if (isset($option_group['is_error']) && $option_group['is_error']) {
       return false;
     }
+    $params['option_group_id'] = $option_group['id'];
+    $params['name'] = $name;
+    $params['version'] = 3;
+    $activity_type = civicrm_api('OptionValue', 'getsingle', $params);
+    if (isset($activity_type['is_error']) && $activity_type['is_error']) {
+      return false;
+    }
+    return $activity_type['id'];
   }
 
   /**

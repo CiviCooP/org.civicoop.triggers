@@ -21,7 +21,11 @@ class CRM_Triggers_Utils_AutomatedHandling {
   
   private function __construct() {
     $params['name'] = 'Automated Handling';
-    $tag = civicrm_api3('Tag', 'getsingle', $params);
+    $params['version'] = 3;
+    $tag = civicrm_api('Tag', 'getsingle', $params);
+    if (isset($tag['is_error']) && $tag['is_error']) {
+      throw new API_Exception('API Error: Tag.getsingle');
+    }
     $this->tag_id = $tag['id'];
   }
   
@@ -48,17 +52,17 @@ class CRM_Triggers_Utils_AutomatedHandling {
       $tag_params['entity_id'] = $objects['Contact']->id;
       $class = get_class($objects['Contact']);
       $tag_params['entity_table'] = $class::getTableName();
-      try {
-        $result = civicrm_api3('EntityTag', 'get', $tag_params);
-        foreach($result['values'] as $value) {
-          if (isset($value['tag_id']) && $value['tag_id'] == $this->tag_id) {
-            return true; //tag exist
-          }
-        }
-        return false; //tag doesn't exist
-      } catch (Exception $ex) {
-        return false; //tag does not exist so stop processing
+      $tag_params['version'] = 3;
+      $result = civicrm_api3('EntityTag', 'get', $tag_params);
+      if (isset($result['is_error']) && $result['is_error']) {
+        return false;
       }
+      foreach($result['values'] as $value) {
+        if (isset($value['tag_id']) && $value['tag_id'] == $this->tag_id) {
+          return true; //tag exist
+        }
+      }
+      return false; //tag doesn't exist
     }
     return true;    
   }

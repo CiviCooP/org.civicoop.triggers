@@ -92,10 +92,17 @@ abstract class CRM_Triggers_Rule_BaseConditionParser {
       $gid = $field['custom_group_id'];
 
       if (!isset(self::$custom_groups[$gid])) {
-        self::$custom_groups[$gid] = civicrm_api3('CustomGroup', 'getsingle', array('id' => $gid));
+        $api_result = civicrm_api('CustomGroup', 'getsingle', array('id' => $gid, 'version' => 3));
+        if (isset($api_result['is_error']) && $api_result['is_error']) {
+          throw new API_Exception('API Error: CustomGroup.getsingle');
+        }
+        self::$custom_groups[$gid] = $api_result;
       }
       if (!isset(self::$custom_fields[$gid])) {
-        $fields = civicrm_api3('CustomField', 'get', array('custom_group_id' => $gid));
+        $fields = civicrm_api('CustomField', 'get', array('custom_group_id' => $gid, 'version' => 3));
+        if (isset($fields['is_error']) && $fields['is_error']) {
+          throw new API_Exception('API Error: CustomField.get');
+        }
         foreach ($fields['values'] as $f) {
           self::$custom_fields[$gid]['custom_' . $f['id']] = $f;
         }

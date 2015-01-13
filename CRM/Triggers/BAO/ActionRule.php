@@ -30,7 +30,11 @@ class CRM_Triggers_BAO_ActionRule extends CRM_Triggers_DAO_ActionRule {
         $params = $this->parseParams($objects, $rule_schedule);
         
         if ($this->checkForProcessing($objects, $params)) {        
-          civicrm_api3($this->entity, $this->action, $params);
+          $params['version'] = 3;
+          $r = civicrm_api($this->entity, $this->action, $params);
+          if (isset($r['is_error']) && $r['is_error']) {
+            throw new API_Exception('API Error '.$this->entity.'.'.$this->action);
+          }
           $processedContacts[$contact->id] = $contact;
           $processCount++;
         }
@@ -38,7 +42,11 @@ class CRM_Triggers_BAO_ActionRule extends CRM_Triggers_DAO_ActionRule {
     } else {
       $params = $this->parseParams($objects, $rule_schedule);
       if ($this->checkForProcessing($objects, $params)) {        
-        civicrm_api3($this->entity, $this->action, $params);
+        $params['version'] = 3;
+        $r = civicrm_api($this->entity, $this->action, $params);
+        if (isset($r['is_error']) && $r['is_error']) {
+            throw new API_Exception('API Error '.$this->entity.'.'.$this->action);
+          }
         $processCount++;
       }
     }
