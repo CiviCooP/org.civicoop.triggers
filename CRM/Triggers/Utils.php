@@ -94,7 +94,10 @@ class CRM_Triggers_Utils {
     
     $class = get_class($objRef);
     $fields = $class::fields();
-		$keyFields = call_user_func($class.'::fieldKeys()');
+    $keyFields = array_keys($fields);
+    if (method_exists($class, 'fieldKeys')) {
+      $keyFields = call_user_func($class.'::fieldKeys()');
+    }
     
     $contact_ids = array();
     if ($objRef instanceof CRM_Activity_DAO_Activity) {
