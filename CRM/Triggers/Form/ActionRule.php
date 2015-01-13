@@ -91,9 +91,12 @@ class CRM_Triggers_Form_ActionRule extends CRM_Core_Form {
       $session->setStatus('Action Rule deleted', 'Delete', 'success');
       CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/actionruleslist'));
     }
-    $apiEntities = civicrm_api3('Entity', 'Get', array());
+    $apiEntities = civicrm_api('Entity', 'Get', array('version' => 3));
+    if (isset($apiEntities['is_error']) && $apiEntities['is_error']) {
+      throw new API_Exception('API Error: Entity.get');
+    }
     $this->_actionRuleEntities = $apiEntities['values'];
-    $this->_actionRuleActions = array('Create', 'Read', 'Update', 'Delete');
+    $this->_actionRuleActions = array('Create', 'Read', 'Update', 'Delete', 'Send');
 
     /*
      * if action is not add, store action_id in $this->_id

@@ -40,6 +40,8 @@ class CRM_Triggers_BAO_ActionRule extends CRM_Triggers_DAO_ActionRule {
         }
       }
     } else {
+      $objects = $entities;
+      $objects['Contact'] = $contact;
       $params = $this->parseParams($objects, $rule_schedule);
       if ($this->checkForProcessing($objects, $params)) {        
         $params['version'] = 3;
