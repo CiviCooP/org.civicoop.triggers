@@ -76,7 +76,11 @@ class CRM_Triggers_Utils {
   public static function getContactsFromEntities($entities) {
     $contacts = array();
     foreach($entities as $entity) {
-      $contacts = array_merge($contacts, self::getContactsFromEntity($entity));
+      foreach(self::getContactsFromEntity($entity) as $contact) {
+        if (!isset($contacts[$contact->id])) {
+          $contacts[$contact->id] = $contact;
+        }
+      }
     }
     return $contacts;
   }
