@@ -88,6 +88,10 @@ class CRM_Triggers_BAO_RuleSchedule extends CRM_Triggers_DAO_RuleSchedule {
     $rule_schedule_trigger = CRM_Triggers_BAO_RuleScheduleTrigger::findByRuleScheduleId($this->id, false);
     $builder = false;
     $daoClass = false;
+
+    $alreadyProcessedConditions = new CRM_Triggers_QueryBuilder_Subcondition();
+    $alreadyProcessedConditions->linkToPrevious = 'AND';
+
     self::$processedTriggers[$this->id] = array(); //reset the processed dao classes
     while ($rule_schedule_trigger->fetch()) {
       if ($builder === false) {
@@ -99,18 +103,23 @@ class CRM_Triggers_BAO_RuleSchedule extends CRM_Triggers_DAO_RuleSchedule {
       }
       
       if (!isset(self::$processedTriggers[$this->id][$rule_schedule_trigger->id])) {
-        $rule_schedule_trigger->addTriggerConditionsToQueryBuilder($builder);
+        $alreadyProcessedCondition = new CRM_Triggers_QueryBuilder_Subcondition();
+        $alreadyProcessedCondition->linkToPrevious = 'OR';
+        $rule_schedule_trigger->addTriggerConditionsToQueryBuilder($builder, $alreadyProcessedCondition);
+        $alreadyProcessedConditions->addCond($alreadyProcessedCondition);
         $rule_schedule_trigger->addSelectToQueryBuilder($builder);
         self::$processedTriggers[$this->id][$rule_schedule_trigger->id] = $rule_schedule_trigger->getTriggerRule();
       }
     }
+
+    $builder->addWhere($alreadyProcessedConditions);
     
     $hooks = CRM_Utils_Hook::singleton();
     $hooks->invoke(3,
       $this, $builder, self::$processedTriggers[$this->id], CRM_Utils_Hook::$_nullObject, CRM_Utils_Hook::$_nullObject,
       'civicrm_trigger_pre_execute_entity_query'
       );
-
+    
     $entityDao = CRM_Core_DAO::executeQuery($builder->toSql(), array(), TRUE, $daoClass);
     
     return $entityDao;

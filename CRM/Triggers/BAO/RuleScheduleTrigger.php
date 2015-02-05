@@ -63,8 +63,9 @@ class CRM_Triggers_BAO_RuleScheduleTrigger extends CRM_Triggers_DAO_RuleSchedule
    * Adds the trigger conditions to the query builder
    * 
    * @param CRM_Triggers_QueryBuilder $builder
+   * @param CRM_Triggers_QueryBuilder_Subcondition &$alreadyProcessedCondition
    */
-  public function addTriggerConditionsToQueryBuilder(CRM_Triggers_QueryBuilder $builder) {
+  public function addTriggerConditionsToQueryBuilder(CRM_Triggers_QueryBuilder $builder, CRM_Triggers_QueryBuilder_Subcondition &$alreadyProcessedCondition) {
     //build condition for this dao
     $trigger = $this->getTriggerRule();
     $wheres = new CRM_Triggers_QueryBuilder_Subcondition();
@@ -75,12 +76,10 @@ class CRM_Triggers_BAO_RuleScheduleTrigger extends CRM_Triggers_DAO_RuleSchedule
       $having->linkToPrevious = $this->logic_operator;
     }
     $conditions = CRM_Triggers_BAO_TriggerRuleCondition::findByTriggerRuleId($trigger->id);
-    $alreadyProcessedConditions = new CRM_Triggers_QueryBuilder_Subcondition();
-    $alreadyProcessedConditions->linkToPrevious = 'AND';
     while($conditions->fetch()) {
       $parser = $conditions->getParser();
       $parser->parseCondition($where, $having, $builder, $trigger);
-      $parser->addAlreadyProcessedCondition($alreadyProcessedConditions, $this);
+      $parser->addAlreadyProcessedCondition($alreadyProcessedCondition, $this);
     }
     
     $hooks = CRM_Utils_Hook::singleton();
@@ -89,8 +88,7 @@ class CRM_Triggers_BAO_RuleScheduleTrigger extends CRM_Triggers_DAO_RuleSchedule
       'civicrm_trigger_condition_parse'
       );
     
-    $wheres->addCond($where);    
-    $wheres->addCond($alreadyProcessedConditions);
+    $wheres->addCond($where);
     
     //add the conditions to the query builder
     $builder->addWhere($wheres);
