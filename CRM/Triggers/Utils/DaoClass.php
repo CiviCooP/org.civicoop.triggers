@@ -7,10 +7,10 @@ class CRM_Triggers_Utils_DaoClass {
     if (empty($daoEntity)) {
       switch($fullName) {
         case 'ActivityTarget':
-          $daoEntity = 'CRM_Activity_DAO_ActivityTarget';
+          $daoEntity = 'CRM_Activity_DAO_ActivityContact';
           break;
         case 'ActivityAssignment':
-          $daoEntity = 'CRM_Activity_DAO_ActivityAssignment';
+          $daoEntity = 'CRM_Activity_DAO_ActivityContact';
           break;
       }
     }

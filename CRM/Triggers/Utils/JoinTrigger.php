@@ -27,10 +27,15 @@ class CRM_Triggers_Utils_JoinTrigger {
     foreach($references as $ref) {
       foreach($dao_classes as $alias => $dao_class) {
         if ($ref->getTargetTable() == $dao_class::getTableName()) {
-          return new CRM_Triggers_QueryBuilder_Condition(
+          $condition = new CRM_Triggers_QueryBuilder_Subcondition();
+          $condition->addCond(new CRM_Triggers_QueryBuilder_Condition(
             "`".$alias."`.`".$ref->getTargetKey() . 
             "` = `".$table_alias."`.`".$ref->getReferenceKey()."`"
-          );
+          ));
+          if ($ref->getExtraCondition()) {
+            $condition->addCond($ref->getExtraCondition());
+          }
+          return $condition;
         }
       }
     }
@@ -39,10 +44,15 @@ class CRM_Triggers_Utils_JoinTrigger {
       $references = CRM_Triggers_Utils_JoinTrigger::getDaoReferenceColumns($dao_class);
       foreach($references as $ref) {
         if ($ref->getTargetTable() == $trigger_dao_class::getTableName()) {
-          return new CRM_Triggers_QueryBuilder_Condition(
+          $condition = new CRM_Triggers_QueryBuilder_Subcondition();
+          $condition->addCond(new CRM_Triggers_QueryBuilder_Condition(
             "`".$table_alias."`.`".$ref->getTargetKey() . 
             "` = `".$alias."`.`".$ref->getReferenceKey()."`"
-          );
+          ));
+          if ($ref->getExtraCondition()) {
+            $condition->addCond($ref->getExtraCondition());
+          }
+          return $condition;
         }
       }
     }
@@ -54,10 +64,18 @@ class CRM_Triggers_Utils_JoinTrigger {
       foreach($trigger_references as $trigger_ref) {
         foreach($references as $ref) {
           if ($ref->getTargetTable() == $trigger_ref->getTargetTable() && $ref->getTargetKey() == $trigger_ref->getTargetKey()) {
-            return new CRM_Triggers_QueryBuilder_Condition(
+            $condition = new CRM_Triggers_QueryBuilder_Subcondition();
+            $condition->addCond(new CRM_Triggers_QueryBuilder_Condition(
               "`".$table_alias."`.`".$trigger_ref->getReferenceKey() . 
               "` = `".$alias."`.`".$ref->getReferenceKey()."`"
-            );
+            ));
+            if ($ref->getExtraCondition()) {
+              $condition->addCond($ref->getExtraCondition());
+            }
+            if ($trigger_ref->getExtraCondition()) {
+              $condition->addCond($trigger_ref->getExtraCondition());
+            }
+            return $condition;
           }
         }
       }
@@ -86,11 +104,19 @@ class CRM_Triggers_Utils_JoinTrigger {
     if (method_exists($dao_class, 'getReferenceColumns')) {
       $references = CRM_Triggers_Utils_EntityReference::convertReferences($dao_class::getReferenceColumns());
     } elseif ($dao_class == 'CRM_Activity_DAO_ActivityTarget') {
-      $references[] = new CRM_Triggers_Utils_EntityReference($dao_class::getTableName() , 'target_contact_id', 'civicrm_contact', 'id');
-      $references[] = new CRM_Triggers_Utils_EntityReference($dao_class::getTableName() , 'activity_id', 'civicrm_activity', 'id');
+      $contact_ref = new CRM_Triggers_Utils_EntityReference('civicrm_activity_contact' , 'contact_id', 'civicrm_contact', 'id');
+      $contact_ref->addExtraCondition(new CRM_Triggers_QueryBuilder_Condition('record_type_id = 3'));
+      $references[] = $contact_ref;
+      $activity_ref = new CRM_Triggers_Utils_EntityReference('civicrm_activity_contact' , 'activity_id', 'civicrm_activity', 'id');
+      $activity_ref->addExtraCondition(new CRM_Triggers_QueryBuilder_Condition('record_type_id = 3'));
+      $references[] = $activity_ref;
     } elseif ($dao_class == 'CRM_Activity_DAO_ActivityAssignment') {
-      $references[] = new CRM_Triggers_Utils_EntityReference($dao_class::getTableName() , 'assignee_contact_id', 'civicrm_contact', 'id');
-      $references[] = new CRM_Triggers_Utils_EntityReference($dao_class::getTableName() , 'activity_id', 'civicrm_activity', 'id');
+      $contact_ref = new CRM_Triggers_Utils_EntityReference('civicrm_activity_contact' , 'contact_id', 'civicrm_contact', 'id');
+      $contact_ref->addExtraCondition(new CRM_Triggers_QueryBuilder_Condition('record_type_id = 1'));
+      $references[] = $contact_ref;
+      $activity_ref = new CRM_Triggers_Utils_EntityReference('civicrm_activity_contact' , 'activity_id', 'civicrm_activity', 'id');
+      $activity_ref->addExtraCondition(new CRM_Triggers_QueryBuilder_Condition('record_type_id = 1'));
+      $references[] = $activity_ref;
     } else {
       //not in every version of civicrm the reference columns are defined.
       //so we have to add them manually.
