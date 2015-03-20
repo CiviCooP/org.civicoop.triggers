@@ -176,5 +176,6 @@ function triggers_civicrm_navigationMenu( &$params ) {
  */
 function triggers_civicrm_trigger_check_action_execution(&$doProcessing, $objects, $params, CRM_Triggers_BAO_ActionRule $action_rule) {
   $automated_handling = CRM_Triggers_Utils_AutomatedHandling::singleton();
-  $doProcessing = $automated_handling->checkActionExecution($objects, $params, $action_rule);
+  //per 23 okt no handling of tags
+  //$doProcessing = $automated_handling->checkActionExecution($objects, $params, $action_rule);
 }

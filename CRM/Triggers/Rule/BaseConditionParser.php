@@ -29,12 +29,34 @@ abstract class CRM_Triggers_Rule_BaseConditionParser {
     $trigger = CRM_Triggers_BAO_TriggerRule::getDaoByTriggerRuleId($this->trigger_rule_condition->trigger_rule_id);
     $entityDAO = $trigger->getEntityDAO();
     $entityDAOClass = $trigger->getEntityDAOClass();
+    $table_alias = $trigger->getTableAlias();
     
     //check if field exist in DAO    
     $sqlFieldName = false;
     $field = CRM_Triggers_Utils::getFieldFromDao($entityDAO, $field_name);
     if ($field !== false) {
-      $sqlFieldName = $this->parseField($field, $entityDAOClass::getTableName(), $builder);
+      $sqlFieldName = $this->parseField($field, $table_alias, $builder);
+    }
+    
+    return $sqlFieldName;
+  }
+  
+  protected function getSqlFieldAlias($field_name, CRM_Triggers_QueryBuilder $builder) {
+    $trigger = CRM_Triggers_BAO_TriggerRule::getDaoByTriggerRuleId($this->trigger_rule_condition->trigger_rule_id);
+    $entityDAO = $trigger->getEntityDAO();
+    $entityDAOClass = $trigger->getEntityDAOClass();
+    $table_alias = $trigger->getTableAlias();
+    
+    //check if field exist in DAO    
+    $sqlFieldName = false;
+    $field = CRM_Triggers_Utils::getFieldFromDao($entityDAO, $field_name);
+    if ($field !== false) {
+      $sqlFieldName = $this->parseField($field, $table_alias, $builder);
+      if ($sqlFieldName) {
+        //replace the dors in underscore and remove the `
+        $sqlFieldName = str_replace(".", "_", $sqlFieldName);
+        $sqlFieldName = str_replace("`", "", $sqlFieldName);
+      }
     }
     
     return $sqlFieldName;
@@ -70,10 +92,17 @@ abstract class CRM_Triggers_Rule_BaseConditionParser {
       $gid = $field['custom_group_id'];
 
       if (!isset(self::$custom_groups[$gid])) {
-        self::$custom_groups[$gid] = civicrm_api3('CustomGroup', 'getsingle', array('id' => $gid));
+        $api_result = civicrm_api('CustomGroup', 'getsingle', array('id' => $gid, 'version' => 3));
+        if (isset($api_result['is_error']) && $api_result['is_error']) {
+          throw new API_Exception('API Error: CustomGroup.getsingle');
+        }
+        self::$custom_groups[$gid] = $api_result;
       }
       if (!isset(self::$custom_fields[$gid])) {
-        $fields = civicrm_api3('CustomField', 'get', array('custom_group_id' => $gid));
+        $fields = civicrm_api('CustomField', 'get', array('custom_group_id' => $gid, 'version' => 3));
+        if (isset($fields['is_error']) && $fields['is_error']) {
+          throw new API_Exception('API Error: CustomField.get');
+        }
         foreach ($fields['values'] as $f) {
           self::$custom_fields[$gid]['custom_' . $f['id']] = $f;
         }

@@ -20,9 +20,15 @@ class CRM_Triggers_Rule_PlainConditionParser extends CRM_Triggers_Rule_BaseCondi
         throw new CRM_Triggers_Exception_InvalidCondition("Invalid field '".$this->trigger_rule_condition->field_name."'");
       }
     
-      $strCond = "".$sqlFieldName."";
-      $strCond .= " ".$this->trigger_rule_condition->operation." ";
-      $strCond .= $this->escapeValue($this->trigger_rule_condition->value);
+      if ($this->trigger_rule_condition->operation == "IS NOT EMPTY") {
+        $strCond = "(".$sqlFieldName." IS NOT NULL OR ".$sqlFieldName ." != '')";
+      } elseif ($this->trigger_rule_condition->operation == "IS EMPTY") {
+        $strCond = "(".$sqlFieldName." IS NULL OR ".$sqlFieldName ." = '')";
+      } else {
+        $strCond = "".$sqlFieldName."";
+        $strCond .= " ".$this->trigger_rule_condition->operation." ";
+        $strCond .= $this->escapeValue($this->trigger_rule_condition->value);
+      }
       
       $cond = new CRM_Triggers_QueryBuilder_Condition($strCond);
       $where->addCond($cond);  
@@ -31,9 +37,10 @@ class CRM_Triggers_Rule_PlainConditionParser extends CRM_Triggers_Rule_BaseCondi
   public function addAlreadyProcessedCondition(CRM_Triggers_QueryBuilder_Subcondition $alreadyProcessedConditions, CRM_Triggers_BAO_RuleScheduleTrigger $rule_schedule_trigger) {
     $trigger = CRM_Triggers_BAO_TriggerRule::getDaoByTriggerRuleId($this->trigger_rule_condition->trigger_rule_id);
     $entityDAOClass = $trigger->getEntityDAOClass();
+    $table_alias = $trigger->getTableAlias();
     
     //add a join on civicrm_processed_trigger
-    $alreadyProcessedCond = new CRM_Triggers_QueryBuilder_Condition("`".$entityDAOClass::getTableName() ."`.`id` NOT IN ("
+    $alreadyProcessedCond = new CRM_Triggers_QueryBuilder_Condition("`".$table_alias ."`.`id` NOT IN ("
         . "SELECT `entity_id` FROM `civicrm_processed_trigger` "
         . "WHERE `entity` = ".$this->escapeValue($trigger->entity, true)." "
         . "AND `rule_schedule_id` = ".$this->escapeValue($rule_schedule_trigger->rule_schedule_id, true).")");

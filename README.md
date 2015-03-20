@@ -47,6 +47,8 @@ The action is the action which is executed on a found entity. The action consist
 
 The API parameters can contain *tokens* which consist of curly brackets around them and the entity name with a dot for the field of the entity. e.g. {contribution.total_amount}
 
+The entities refer back to the entities used in the trigger part. If you have moltiple entities e.g. multiple groups you can use group one as {group1.id} and for the second group {group2.id}
+
 ###Rule Schedule
 
 A rule schedule determines when a rule is scheduled for checking and executing the action

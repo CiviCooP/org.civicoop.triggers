@@ -15,6 +15,26 @@ class CRM_Triggers_BAO_RuleScheduleTrigger extends CRM_Triggers_DAO_RuleSchedule
   }
   
   /**
+   * Function to delete rule schedule
+   * 
+   * @author Erik Hommel (CiviCooP) <erik.hommel@civicoop.org>
+   * @date 11 Apr 2014
+   * @param int $ruleScheduTriggerleId 
+   * @return boolean
+   * @access public
+   * @static
+   */
+  public static function deleteById($ruleScheduleTriggerId) {
+    if (empty($ruleScheduleTriggerId)) {
+        throw new Exception('ruleScheduleTriggerId can not be empty when attempting to delete one');
+    }
+    $ruleScheduleTrigger = new CRM_Triggers_BAO_RuleScheduleTrigger();
+    $ruleScheduleTrigger->id = $ruleScheduleTriggerId;
+    $ruleScheduleTrigger->delete();
+    return TRUE;
+  }
+  
+  /**
    * Returns a new QueryBuilder object for this trigger
    * 
    * @return CRM_Triggers_QueryBuilder
@@ -22,7 +42,7 @@ class CRM_Triggers_BAO_RuleScheduleTrigger extends CRM_Triggers_DAO_RuleSchedule
   public function createQueryBuilder() {
     $trigger = $this->getTriggerRule();
     $daoClass = $trigger->getEntityDAOClass();
-    $builder = new CRM_Triggers_QueryBuilder("`" . $daoClass::getTableName() . "`");
+    $builder = new CRM_Triggers_QueryBuilder("`" . $daoClass::getTableName() . "` `".$trigger->getTableAlias()."`");
     return $builder;
   }
   
@@ -30,10 +50,11 @@ class CRM_Triggers_BAO_RuleScheduleTrigger extends CRM_Triggers_DAO_RuleSchedule
     $trigger = $this->getTriggerRule();
     $daoClass = $trigger->getEntityDAOClass();
     $fields = $daoClass::fields();
-    $table = $daoClass::getTableName();
+    $table_alias = $trigger->getTableAlias();
+    
     foreach($fields as $field) {
       if (isset($field['name'])) {
-        $builder->addSelect("`".$table."`.`".$field['name']."` AS `".$table."_".$field['name']."`");
+        $builder->addSelect("`".$table_alias."`.`".$field['name']."` AS `".$table_alias."_".$field['name']."`");
       }
     }
   }
@@ -42,8 +63,9 @@ class CRM_Triggers_BAO_RuleScheduleTrigger extends CRM_Triggers_DAO_RuleSchedule
    * Adds the trigger conditions to the query builder
    * 
    * @param CRM_Triggers_QueryBuilder $builder
+   * @param CRM_Triggers_QueryBuilder_Subcondition &$alreadyProcessedCondition
    */
-  public function addTriggerConditionsToQueryBuilder(CRM_Triggers_QueryBuilder $builder) {
+  public function addTriggerConditionsToQueryBuilder(CRM_Triggers_QueryBuilder $builder, CRM_Triggers_QueryBuilder_Subcondition &$alreadyProcessedCondition) {
     //build condition for this dao
     $trigger = $this->getTriggerRule();
     $wheres = new CRM_Triggers_QueryBuilder_Subcondition();
@@ -54,12 +76,10 @@ class CRM_Triggers_BAO_RuleScheduleTrigger extends CRM_Triggers_DAO_RuleSchedule
       $having->linkToPrevious = $this->logic_operator;
     }
     $conditions = CRM_Triggers_BAO_TriggerRuleCondition::findByTriggerRuleId($trigger->id);
-    $alreadyProcessedConditions = new CRM_Triggers_QueryBuilder_Subcondition();
-    $alreadyProcessedConditions->linkToPrevious = 'AND';
     while($conditions->fetch()) {
       $parser = $conditions->getParser();
       $parser->parseCondition($where, $having, $builder, $trigger);
-      $parser->addAlreadyProcessedCondition($alreadyProcessedConditions, $this);
+      $parser->addAlreadyProcessedCondition($alreadyProcessedCondition, $this);
     }
     
     $hooks = CRM_Utils_Hook::singleton();
@@ -68,8 +88,7 @@ class CRM_Triggers_BAO_RuleScheduleTrigger extends CRM_Triggers_DAO_RuleSchedule
       'civicrm_trigger_condition_parse'
       );
     
-    $wheres->addCond($where);    
-    $wheres->addCond($alreadyProcessedConditions);
+    $wheres->addCond($where);
     
     //add the conditions to the query builder
     $builder->addWhere($wheres);

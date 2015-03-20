@@ -22,6 +22,7 @@ class CRM_Triggers_BAO_RuleSchedule extends CRM_Triggers_DAO_RuleSchedule {
     $rule_schedule->whereAdd('(start_date IS NULL OR start_date <= NOW())');
     $rule_schedule->whereAdd('(end_date IS NULL OR end_date >= NOW())');
     $rule_schedule->whereAdd('(next_run <= NOW())');
+    $rule_schedule->orderBy("`next_run` ASC");
 
     $rule_schedule->find($fetchFirst);
 
@@ -53,19 +54,29 @@ class CRM_Triggers_BAO_RuleSchedule extends CRM_Triggers_DAO_RuleSchedule {
     if (!isset(self::$processedTriggers[$this->id])) {
       return;
     }
+    $entity_count = array();
     $entities = array();
     $fields = $entityQuery->toArray();
     foreach(self::$processedTriggers[$this->id] as $trigger) {
       $dao_class = $trigger->getEntityDAOClass();
       $dao = new $dao_class();
-      $table = $dao_class::getTableName();
+      $table = $trigger->getTableAlias();
       foreach($fields as $key => $val) {
         if (strpos($key, $table."_")===0) {
           $fieldName = str_replace($table."_", "", $key);
           $dao->$fieldName = $val;
         }
       }
-      $entities[$trigger->entity] = $dao;
+      if (isset($entity_count[$trigger->entity])) {
+        $entity_count[$trigger->entity]++;
+        $count = $entity_count[$trigger->entity];
+        $entities[$trigger->entity.''.$count] = $dao;
+      } else {
+        $entities[$trigger->entity] = $dao;
+        $entity_count[$trigger->entity] = 1;
+        $count = $entity_count[$trigger->entity];
+        $entities[$trigger->entity.''.$count] = $dao;
+      }
     }
     return $entities;
   }
@@ -77,6 +88,10 @@ class CRM_Triggers_BAO_RuleSchedule extends CRM_Triggers_DAO_RuleSchedule {
     $rule_schedule_trigger = CRM_Triggers_BAO_RuleScheduleTrigger::findByRuleScheduleId($this->id, false);
     $builder = false;
     $daoClass = false;
+
+    $alreadyProcessedConditions = new CRM_Triggers_QueryBuilder_Subcondition();
+    $alreadyProcessedConditions->linkToPrevious = 'AND';
+
     self::$processedTriggers[$this->id] = array(); //reset the processed dao classes
     while ($rule_schedule_trigger->fetch()) {
       if ($builder === false) {
@@ -88,18 +103,23 @@ class CRM_Triggers_BAO_RuleSchedule extends CRM_Triggers_DAO_RuleSchedule {
       }
       
       if (!isset(self::$processedTriggers[$this->id][$rule_schedule_trigger->id])) {
-        $rule_schedule_trigger->addTriggerConditionsToQueryBuilder($builder);
+        $alreadyProcessedCondition = new CRM_Triggers_QueryBuilder_Subcondition();
+        $alreadyProcessedCondition->linkToPrevious = 'OR';
+        $rule_schedule_trigger->addTriggerConditionsToQueryBuilder($builder, $alreadyProcessedCondition);
+        $alreadyProcessedConditions->addCond($alreadyProcessedCondition);
         $rule_schedule_trigger->addSelectToQueryBuilder($builder);
         self::$processedTriggers[$this->id][$rule_schedule_trigger->id] = $rule_schedule_trigger->getTriggerRule();
       }
     }
+
+    $builder->addWhere($alreadyProcessedConditions);
     
     $hooks = CRM_Utils_Hook::singleton();
     $hooks->invoke(3,
       $this, $builder, self::$processedTriggers[$this->id], CRM_Utils_Hook::$_nullObject, CRM_Utils_Hook::$_nullObject,
       'civicrm_trigger_pre_execute_entity_query'
       );
-
+    
     $entityDao = CRM_Core_DAO::executeQuery($builder->toSql(), array(), TRUE, $daoClass);
     
     return $entityDao;
@@ -113,11 +133,14 @@ class CRM_Triggers_BAO_RuleSchedule extends CRM_Triggers_DAO_RuleSchedule {
    */
   protected function addJoinedTriggerToQueryBuilder(CRM_Triggers_BAO_RuleScheduleTrigger $rule_schedule_trigger, CRM_Triggers_QueryBuilder $builder) {
     $daoClass = $rule_schedule_trigger->getTriggerRule()->getEntityDAOClass();
-    $joinCondition = CRM_Triggers_Utils_JoinTrigger::createJoinCondition($this->getProcessedDAOClasses(), $daoClass);
+    $table_alias = $rule_schedule_trigger->getTriggerRule()->getTableAlias();
+    $joinCondition = CRM_Triggers_Utils_JoinTrigger::createJoinCondition($this->getProcessedDAOClasses(), $daoClass, $table_alias);
     
-    $table = $daoClass::getTableName();
-    $joinStatement = " LEFT JOIN `".$table."` ON (".$joinCondition->toSqlCondition().")";
-    $builder->addJoin($joinStatement, $table);    
+    if ($joinCondition) {
+      $table = $daoClass::getTableName();
+      $joinStatement = " LEFT JOIN `".$table."` `".$table_alias."` ON (".$joinCondition->toSqlCondition().")";
+      $builder->addJoin($joinStatement, $table_alias);    
+    }
   }
   
   /** 
@@ -127,7 +150,7 @@ class CRM_Triggers_BAO_RuleSchedule extends CRM_Triggers_DAO_RuleSchedule {
     $return = array();
     if (isset(self::$processedTriggers[$this->id])) {
       foreach(self::$processedTriggers[$this->id] as $trigger) {
-        $return[] = $trigger->getEntityDAOClass();
+        $return[$trigger->getTableAlias()] = $trigger->getEntityDAOClass();
       }
     }
     return $return;
@@ -167,15 +190,20 @@ class CRM_Triggers_BAO_RuleSchedule extends CRM_Triggers_DAO_RuleSchedule {
    * Reschedule this trigger/action combination and set last run date
    */
   public function reschedule() {
-    $this->last_run = date('YmdHis');
+    
+    $dao = new CRM_Triggers_BAO_RuleSchedule();
+    $dao->id = $this->id;
+    if ($dao->find(TRUE)) {
+      $dao->last_run = date('YmdHis');
 
-    if (strlen($this->schedule)) {
-      $date = new DateTime();
-      $date->modify($this->schedule);
-      $this->next_run = $date->format('YmdHis');
+      if (strlen($dao->schedule)) {
+        $date = new DateTime();
+        $date->modify($this->schedule);
+        $dao->next_run = $date->format('YmdHis');
+      }
+
+      $dao->save();
     }
-
-    $this->save();
   }
   /**
    * Function to add or update rule schedule

@@ -28,18 +28,24 @@ class CRM_Triggers_BAO_ActionRule extends CRM_Triggers_DAO_ActionRule {
         $objects = $entities;
         $objects['Contact'] = $contact;
         $params = $this->parseParams($objects, $rule_schedule);
-        
         if ($this->checkForProcessing($objects, $params)) {        
-          civicrm_api3($this->entity, $this->action, $params);
-          $processedContacts[$contact->id] = $contact;
-          $processCount++;
+          $params['version'] = 3;
+          $r = civicrm_api($this->entity, $this->action, $params);
+          if (!isset($r['is_error']) || !$r['is_error']) {
+            $processedContacts[$contact->id] = $contact;
+            $processCount++;
+          }
         }
       }
     } else {
+      $objects = $entities;
       $params = $this->parseParams($objects, $rule_schedule);
       if ($this->checkForProcessing($objects, $params)) {        
-        civicrm_api3($this->entity, $this->action, $params);
-        $processCount++;
+        $params['version'] = 3;
+        $r = civicrm_api($this->entity, $this->action, $params);
+        if (!isset($r['is_error']) || !$r['is_error']) {
+          $processCount++;
+        }
       }
     }
     
@@ -82,9 +88,11 @@ class CRM_Triggers_BAO_ActionRule extends CRM_Triggers_DAO_ActionRule {
     }
     
     $fields = array();
+    $object_keys = array();
     foreach($objects as $entity => $obj) {
       $class = get_class($obj);
       $fields[$entity] = $class::fields();
+      $object_keys[strtolower($entity)] = $entity;
     }
     
     $hooks = CRM_Utils_Hook::singleton();
@@ -97,23 +105,19 @@ class CRM_Triggers_BAO_ActionRule extends CRM_Triggers_DAO_ActionRule {
     foreach($params as $key => $val) {  
       //check if the val is encapsulated into brackets { }      
       //e.g. {contribution.status_id}      
-         
       $matches = array();      
       if (!isset($return[$key]) && preg_match("/{(.*)\.(.*)}/", $val, $matches)) {
         //value looks like {entity.field}
         //so we split this and we check if objRef is of entty and the field exist on objectref
-        $entityName = CRM_Triggers_Utils::camelCaseEntity($matches[1]);
+        $entity = strtolower($matches[1]);
+        $entity_key = $matches[1];
+        if (isset($object_keys[$entity])) {
+          $entity_key = $object_keys[$entity];
+        }
         $fieldName = $matches[2];
         
-        $entityType = CRM_Core_DAO_AllCoreTables::getFullName($entityName);
-        if ($entityType == NULL) {
-          throw new CRM_Triggers_Exception_DAO_Not_Found("Entity ".$entityName." has no DAO");
-        }
-        //check if objRef is an instanceof $entityType
-        if (isset($objects[$entityName]) && $objects[$entityName] instanceof $entityType) {      
-          if (isset($fields[$entityName]) && isset($fields[$entityName][$fieldName])) {
-            $return[$key] = $objects[$entityName]->$fieldName;
-          }
+        if (isset($objects[$entity_key]) && isset($objects[$entity_key]->$fieldName)) {
+          $return[$key] = $objects[$entity_key]->$fieldName;
         }
       } 
       

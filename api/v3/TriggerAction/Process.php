@@ -50,6 +50,7 @@ function civicrm_api3_trigger_action_process($params) {
     
     //Retrieve the entities
     try {
+			$messages[] = 'Start processing "'.$rule_schedule->label.'"';
       $processedEntityCount = $rule_schedule->process();
       //reschedule the trigger-action
       

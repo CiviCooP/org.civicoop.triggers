@@ -182,9 +182,16 @@ class CRM_Triggers_Form_RuleSchedule extends CRM_Core_Form {
      * if action = delete, execute delete immediately
      */
     if ($this->_action == CRM_Core_Action::DELETE) {
-      CRM_Triggers_BAO_RuleSchedule::deleteById($this->_id);
-      $session->setStatus('Rule Schedule deleted', 'Delete', 'success');
-      CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/ruleschedulelist'));
+      $rst_id = CRM_Utils_Request::retrieve('rstid', 'Integer', $this);
+      if (!empty($rst_id)) {
+        CRM_Triggers_BAO_RuleScheduleTrigger::deleteById($rst_id);
+        $session->setStatus('Rule Schedule deleted', 'Delete', 'success');
+        CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/ruleschedule', 'reset=1&action=update&rsid='.$this->_id));
+      } else {
+        CRM_Triggers_BAO_RuleSchedule::deleteById($this->_id);
+        $session->setStatus('Rule Schedule deleted', 'Delete', 'success');
+        CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/ruleschedulelist'));
+      }
     }
     /*
      * retrieve all valid action rules
@@ -286,8 +293,8 @@ class CRM_Triggers_Form_RuleSchedule extends CRM_Core_Form {
     /*
      * set delete function for row
      */
-    $scheduledTriggerRow['delete'] = CRM_Utils_System::url('civicrm/rulescheduletriggerdelete', 
-      'rsid='.$this->_id.'&rstid='.$scheduledTriggerRow['id'], true);
+    $scheduledTriggerRow['delete'] = CRM_Utils_System::url('civicrm/ruleschedule', 
+      'action=delete&reset=1&rsid='.$this->_id.'&rstid='.$scheduledTriggerRow['id'], true);
     if (!isset($scheduledTriggerRow['logic_operator'])) {
       $scheduledTriggerRow['logic_operator'] = null;
     }
