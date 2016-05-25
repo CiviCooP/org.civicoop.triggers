@@ -1,3 +1,7 @@
+# ATTENTION!!! THIS EXTENSION HAS BEEN REPLACED BY CIVIRULES AND IS NO LONGER SUPPORTED!
+but feel free to (ab)use :-)
+CiviRules can be found here: https://civicrm.org/extensions/civirules
+
 # CiviCRM Triggers and Actions
 
 ## Explanation
